@@ -14,10 +14,10 @@ Aplikasi ini adalah fansite yang dirancang khusus untuk penggemar basket di Indo
 
 DAFTAR MODUL
 1. News Page
-2. Ranks Page
+2. Players Page
 3. Events Page
 4. Match Page
-5. Profile
+5. Teams Page
 Link Pembagian Kerja: https://docs.google.com/spreadsheets/d/141tMJRtUJNK9xtP574cnxadhk8XeEroCIUmEznovhLE/edit?pli=1&gid=1364640304#gid=1364640304
 
 PERAN PENGGUNA APLIKASI:
