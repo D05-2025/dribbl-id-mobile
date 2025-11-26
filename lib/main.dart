@@ -1,57 +1,26 @@
 import 'package:flutter/material.dart';
 
-class MainPage extends StatefulWidget {
-  const MainPage({super.key});
-
-  @override
-  State<MainPage> createState() => _MainPageState();
+// IMPORT halaman yang benar
+import 'package:dribbl_id/main/main_page.dart';
+import 'package:dribbl_id/main/menu.dart'; 
+void main() {
+  runApp(const MyApp());
 }
 
-class _MainPageState extends State<MainPage> {
-  int _currentIndex = 0;
-
-  final List<Widget> _pages = [
-    Center(child: Text("Home Page")),
-    Center(child: Text("News Page")),
-    Center(child: Text("Events Page")),
-    Center(child: Text("Matches Page")),
-    Center(child: Text("Other Page")),
-  ];
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: _pages[_currentIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: "Home",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.newspaper),
-            label: "News",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.event), 
-            label: "Events",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_month),
-            label: "Matches",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.more_horiz),
-            label: "Other",
-          ),
-        ],
+    return MaterialApp(
+      title: 'DRIBBL.ID',
+      debugShowCheckedModeBanner: false,
+
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
+
+      home: const LandingPage(),
     );
   }
 }
