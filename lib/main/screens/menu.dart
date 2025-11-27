@@ -27,11 +27,11 @@ class _MainPageState extends State<MainPage> {
     if (_currentIndex == 0) {
       bodyContent = const HomePage();
     } else if (_currentIndex == 1) {
-      bodyContent = const NewsEntryListPage();
-    } else if (_currentIndex == 2) {
       bodyContent = const Center(
-        child: Text("News Page", style: TextStyle(color: Colors.white)),
+        child: Text("Match Page", style: TextStyle(color: Colors.white)),
       );
+    } else if (_currentIndex == 2) {
+      bodyContent = const NewsEntryListPage();
     } else if (_currentIndex == 3) {
       bodyContent = const Center(
         child: Text("Events Page", style: TextStyle(color: Colors.white)),
