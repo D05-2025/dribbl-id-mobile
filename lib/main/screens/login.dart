@@ -1,4 +1,5 @@
 import 'package:dribbl_id/main/screens/menu.dart';
+import 'package:dribbl_id/main/screens/register.dart';
 import 'package:flutter/material.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
@@ -155,21 +156,10 @@ class _LoginPageState extends State<LoginPage> {
                   const SizedBox(height: 36.0),
                   GestureDetector(
                     onTap: () {
-                      showDialog(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          title: const Text('Info'),
-                          content: const Text(
-                            'We will create the register page later',
-                          ),
-                          actions: [
-                            TextButton(
-                              child: const Text('OK'),
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                            ),
-                          ],
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const RegisterPage(),
                         ),
                       );
                     },
