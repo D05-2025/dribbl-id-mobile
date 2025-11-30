@@ -1,33 +1,55 @@
 import 'package:flutter/material.dart';
-import '../models/event.dart';
-import '../widgets/event_card.dart';
-import 'event_details.dart';
+import 'package:dribbl_id/events/services/event_service.dart';
+import 'package:dribbl_id/events/widgets/event_card.dart';
+import 'package:dribbl_id/events/screens/event_details.dart';
 
 class EventListPage extends StatelessWidget {
-  final List<Event> events;
-
-  const EventListPage({super.key, required this.events});
+  const EventListPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final service = EventService();
+
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Events"),
-      ),
-      body: events.isEmpty
-          ? const Center(child: Text("Belum ada event"))
-          : ListView.builder(
-        itemCount: events.length,
-        itemBuilder: (context, index) {
-          return EventCard(
-            event: events[index],
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) =>
-                      EventDetailsPage(event: events[index]),
-                ),
+      appBar: AppBar(title: const Text("Events")),
+      body: FutureBuilder(
+        future: service.getEvents(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (snapshot.hasError) {
+            return Center(child: Text("Error: ${snapshot.error}"));
+          }
+
+          if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(
+              child: Text(
+                "No Events Found",
+                style: TextStyle(color: Colors.white70),
+              ),
+            );
+          }
+
+          final events = snapshot.data!;
+
+          return ListView.builder(
+            padding: const EdgeInsets.all(16),
+            itemCount: events.length,
+            itemBuilder: (context, index) {
+              final event = events[index];
+
+              return EventCard(
+                event: event,
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => EventDetailsPage(event: event),
+                    ),
+                  );
+                },
               );
             },
           );
