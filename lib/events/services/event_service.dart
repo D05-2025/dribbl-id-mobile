@@ -21,4 +21,19 @@ class EventService {
       data.map((json) => Event.fromJson(json)),
     );
   }
+
+  Future<Event> addEvent(Event event) async {
+    final response = await http.post(
+      Uri.parse(baseUrl),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode(event.toJson()),
+    );
+
+    if (response.statusCode != 201 && response.statusCode != 200) {
+      throw Exception("Failed to add event (${response.statusCode})");
+    }
+
+    final data = jsonDecode(utf8.decode(response.bodyBytes));
+    return Event.fromJson(data);
+  }
 }

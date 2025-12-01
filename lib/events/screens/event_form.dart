@@ -22,6 +22,19 @@ class _EventFormPageState extends State<EventFormPage> {
   bool isPublic = true;
   String location = "";
 
+  Future pickDate() async {
+    final selected = await showDatePicker(
+      context: context,
+      initialDate: date,
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2030),
+    );
+
+    if (selected != null) {
+      setState(() => date = selected);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -34,32 +47,59 @@ class _EventFormPageState extends State<EventFormPage> {
           key: _formKey,
           child: ListView(
             children: [
-              TextFormField(
-                decoration: const InputDecoration(labelText: "ID Event"),
-                keyboardType: TextInputType.number,
-                onChanged: (v) => id = int.tryParse(v) ?? 0,
-              ),
+
+              // Title
               TextFormField(
                 decoration: const InputDecoration(labelText: "Title"),
                 onChanged: (v) => title = v,
               ),
+
+              // Description
               TextFormField(
                 decoration: const InputDecoration(labelText: "Description"),
+                maxLines: 3,
                 onChanged: (v) => description = v,
               ),
+
+              // Time (string)
               TextFormField(
-                decoration: const InputDecoration(labelText: "Time"),
+                decoration: const InputDecoration(labelText: "Time (e.g. 18:30 WIB)"),
                 onChanged: (v) => time = v,
               ),
+
+              // Image URL
               TextFormField(
                 decoration: const InputDecoration(labelText: "Image URL"),
                 onChanged: (v) => imageUrl = v,
               ),
+
+              // Location
               TextFormField(
                 decoration: const InputDecoration(labelText: "Location"),
                 onChanged: (v) => location = v,
               ),
 
+              const SizedBox(height: 16),
+
+              // Date Picker Button
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      "Tanggal: ${date.toLocal()}".split(" ")[0],
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: pickDate,
+                    child: const Text("Pilih Tanggal"),
+                  )
+                ],
+              ),
+
+              const SizedBox(height: 10),
+
+              // Switch isPublic
               SwitchListTile(
                 title: const Text("Public Event"),
                 value: isPublic,
@@ -68,8 +108,9 @@ class _EventFormPageState extends State<EventFormPage> {
 
               const SizedBox(height: 20),
 
+              // SUBMIT BUTTON
               ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   final newEvent = Event(
                     id: id,
                     title: title,
@@ -81,8 +122,10 @@ class _EventFormPageState extends State<EventFormPage> {
                     location: location,
                   );
 
-                  widget.onSubmit(newEvent);
-                  Navigator.pop(context);
+                  final result = widget.onSubmit(newEvent);
+                  if (result is Future) await result;
+
+                  Navigator.pop(context, true); // penting!
                 },
                 child: const Text("Simpan Event"),
               )

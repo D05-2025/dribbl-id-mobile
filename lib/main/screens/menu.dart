@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:dribbl_id/main/widget/navbar.dart';
 import 'package:dribbl_id/main/screens/home_page.dart';
+import 'package:dribbl_id/events/screens/event_list.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -34,9 +35,10 @@ class _MainPageState extends State<MainPage> {
         child: Text("News Page", style: TextStyle(color: Colors.white)),
       );
     } else if (_currentIndex == 3) {
-      bodyContent = const Center(
-        child: Text("Events Page", style: TextStyle(color: Colors.white)),
-      );
+      // bodyContent = const Center(
+      //   child: Text("Events Page", style: TextStyle(color: Colors.white)),
+      // );
+      bodyContent = const EventListPage();
     } else {
       bodyContent = const Center(
         child: Text("Others Page", style: TextStyle(color: Colors.white)),
