@@ -1,134 +1,189 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import '../models/event.dart';
+import 'package:provider/provider.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
 
 class EventFormPage extends StatefulWidget {
-  final Function(Event) onSubmit;
-
-  const EventFormPage({super.key, required this.onSubmit});
+  const EventFormPage({super.key});
 
   @override
-  _EventFormPageState createState() => _EventFormPageState();
+  State<EventFormPage> createState() => _EventFormPageState();
 }
 
 class _EventFormPageState extends State<EventFormPage> {
   final _formKey = GlobalKey<FormState>();
 
-  int id = 0;
-  String title = "";
-  String description = "";
-  DateTime date = DateTime.now();
-  String time = "";
-  String imageUrl = "";
-  bool isPublic = true;
-  String location = "";
+  String _title = "";
+  String _description = "";
+  String _location = "";
+  String _time = "";
+  String _imageUrl = "";
+  DateTime _date = DateTime.now();
+  bool _isPublic = true;
 
   Future pickDate() async {
     final selected = await showDatePicker(
       context: context,
-      initialDate: date,
+      initialDate: _date,
       firstDate: DateTime(2020),
-      lastDate: DateTime(2030),
+      lastDate: DateTime(2035),
     );
 
     if (selected != null) {
-      setState(() => date = selected);
+      setState(() => _date = selected);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final request = context.watch<CookieRequest>();
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Tambah Event"),
+        backgroundColor: Colors.indigo,
+        foregroundColor: Colors.white,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Form(
-          key: _formKey,
-          child: ListView(
+
+      body: Form(
+        key: _formKey,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
             children: [
 
-              // Title
+              // === Title ===
               TextFormField(
-                decoration: const InputDecoration(labelText: "Title"),
-                onChanged: (v) => title = v,
+                decoration: InputDecoration(
+                  labelText: "Judul Event",
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                ),
+                onChanged: (v) => _title = v,
+                validator: (v) =>
+                (v == null || v.isEmpty) ? "Judul tidak boleh kosong" : null,
               ),
+              const SizedBox(height: 12),
 
-              // Description
+              // === Description ===
               TextFormField(
-                decoration: const InputDecoration(labelText: "Description"),
-                maxLines: 3,
-                onChanged: (v) => description = v,
+                decoration: InputDecoration(
+                  labelText: "Deskripsi",
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                ),
+                maxLines: 4,
+                onChanged: (v) => _description = v,
+                validator: (v) =>
+                (v == null || v.isEmpty) ? "Deskripsi tidak boleh kosong" : null,
               ),
+              const SizedBox(height: 12),
 
-              // Time (string)
+              // === Location ===
               TextFormField(
-                decoration: const InputDecoration(labelText: "Time (e.g. 18:30 WIB)"),
-                onChanged: (v) => time = v,
+                decoration: InputDecoration(
+                  labelText: "Lokasi",
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                ),
+                onChanged: (v) => _location = v,
               ),
+              const SizedBox(height: 12),
 
-              // Image URL
+              // === Time ===
               TextFormField(
-                decoration: const InputDecoration(labelText: "Image URL"),
-                onChanged: (v) => imageUrl = v,
+                decoration: InputDecoration(
+                  labelText: "Waktu (contoh: 18:00 WIB)",
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                ),
+                onChanged: (v) => _time = v,
               ),
+              const SizedBox(height: 12),
 
-              // Location
+              // === Image URL ===
               TextFormField(
-                decoration: const InputDecoration(labelText: "Location"),
-                onChanged: (v) => location = v,
+                decoration: InputDecoration(
+                  labelText: "Image URL",
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                ),
+                onChanged: (v) => _imageUrl = v,
               ),
+              const SizedBox(height: 12),
 
-              const SizedBox(height: 16),
-
-              // Date Picker Button
+              // === Date Picker ===
               Row(
                 children: [
                   Expanded(
                     child: Text(
-                      "Tanggal: ${date.toLocal()}".split(" ")[0],
+                      "Tanggal: ${_date.toLocal()}".split(" ")[0],
                       style: const TextStyle(fontSize: 16),
                     ),
                   ),
                   ElevatedButton(
                     onPressed: pickDate,
                     child: const Text("Pilih Tanggal"),
-                  )
+                  ),
                 ],
               ),
+              const SizedBox(height: 12),
 
-              const SizedBox(height: 10),
-
-              // Switch isPublic
+              // === Public Switch ===
               SwitchListTile(
                 title: const Text("Public Event"),
-                value: isPublic,
-                onChanged: (v) => setState(() => isPublic = v),
+                value: _isPublic,
+                onChanged: (v) => setState(() => _isPublic = v),
               ),
-
               const SizedBox(height: 20),
 
-              // SUBMIT BUTTON
+              // === Submit ===
               ElevatedButton(
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all(Colors.indigo),
+                  padding: MaterialStateProperty.all(
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                  ),
+                ),
                 onPressed: () async {
-                  final newEvent = Event(
-                    id: id,
-                    title: title,
-                    description: description,
-                    date: date,
-                    time: time,
-                    imageUrl: imageUrl,
-                    isPublic: isPublic,
-                    location: location,
-                  );
+                  if (_formKey.currentState!.validate()) {
+                    final response = await request.postJson(
+                      "http://localhost:8000/events/create-flutter/",
+                      jsonEncode({
+                        "title": _title,
+                        "description": _description,
+                        "location": _location,
+                        "date": _date.toIso8601String(),
+                        "time": _time,
+                        "image_url": _imageUrl,
+                        "is_public": _isPublic,
+                      }),
+                    );
 
-                  final result = widget.onSubmit(newEvent);
-                  if (result is Future) await result;
+                    if (!mounted) return;
 
-                  Navigator.pop(context, true); // penting!
+                    if (response["status"] == "success") {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content: Text("Event berhasil disimpan!")),
+                      );
+                      Navigator.pop(context);
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content: Text("Gagal menyimpan event.")),
+                      );
+                    }
+                  }
                 },
-                child: const Text("Simpan Event"),
-              )
+                child: const Text("Simpan Event",
+                    style: TextStyle(color: Colors.white)),
+              ),
             ],
           ),
         ),

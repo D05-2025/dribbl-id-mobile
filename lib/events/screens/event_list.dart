@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:dribbl_id/events/services/event_service.dart';
-import 'package:dribbl_id/events/widgets/event_card.dart';
-import 'package:dribbl_id/events/screens/event_details.dart';
-import 'package:dribbl_id/events/screens/event_form.dart'; // sesuaikan path kalau perlu
-import 'package:dribbl_id/events/models/event.dart';
+import 'package:provider/provider.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import '../models/event.dart';
+import 'event_form.dart';
+import '../widgets/event_card.dart';
+import 'event_details.dart';
 
 class EventListPage extends StatefulWidget {
   const EventListPage({super.key});
@@ -13,84 +14,48 @@ class EventListPage extends StatefulWidget {
 }
 
 class _EventListPageState extends State<EventListPage> {
-  final EventService service = EventService();
+  Future<List<Event>> fetchEvents(CookieRequest request) async {
+    final response = await request.get("http://localhost:8000/events/json/");
 
-  /// Gunakan ini sebagai cache sementara agar tidak memanggil API berulang
-  Future<List<Event>>? _futureEvents;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadEvents();
-  }
-
-  void _loadEvents() {
-    _futureEvents = service.getEvents();
-    setState(() {}); // trigger rebuild
+    List<Event> events = [];
+    for (var e in response) {
+      events.add(Event.fromJson(e));
+    }
+    return events;
   }
 
   @override
   Widget build(BuildContext context) {
+    final request = context.watch<CookieRequest>();
+
     return Scaffold(
       appBar: AppBar(title: const Text("Events")),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          // buka form, tunggu hasil. form akan return `true` jika berhasil simpan
-          final result = await Navigator.push<bool?>(
+          final result = await Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (_) => EventFormPage(
-                onSubmit: (event) async {
-                  // pastikan addEvent mengembalikan Future jika melakukan I/O
-                  await service.addEvent(event);
-                },
-              ),
-            ),
+            MaterialPageRoute(builder: (_) => const EventFormPage()),
           );
 
-          // kalau berhasil (true), reload events
-          if (result == true) {
-            _loadEvents();
-          }
+          if (result == true) setState(() {});
         },
         child: const Icon(Icons.add),
       ),
-      body: FutureBuilder<List<Event>>(
-        future: _futureEvents,
+      body: FutureBuilder(
+        future: fetchEvents(request),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
 
-          if (snapshot.hasError) {
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Text(
-                  "Error: ${snapshot.error}",
-                  style: const TextStyle(color: Colors.redAccent),
-                ),
-              ),
-            );
-          }
-
-          final events = snapshot.data ?? [];
-
-          if (events.isEmpty) {
-            return const Center(
-              child: Text(
-                "No Events Found",
-                style: TextStyle(color: Colors.white70),
-              ),
-            );
+          if (!snapshot.hasData) {
+            return const Center(child: Text("No events found"));
           }
 
           return ListView.builder(
-            padding: const EdgeInsets.all(16),
-            itemCount: events.length,
-            itemBuilder: (context, index) {
-              final event = events[index];
-
+            itemCount: snapshot.data!.length,
+            itemBuilder: (_, index) {
+              final event = snapshot.data![index];
               return EventCard(
                 event: event,
                 onTap: () {

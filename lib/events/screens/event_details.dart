@@ -10,7 +10,6 @@ class EventDetailsPage extends StatelessWidget {
 
   String _formatDate(DateTime dt) {
     final d = dt.toLocal();
-    // Format: 2025-10-25 (ISO style) — gampang dan jelas
     return "${d.year}-${_twoDigits(d.month)}-${_twoDigits(d.day)}";
   }
 
@@ -21,16 +20,13 @@ class EventDetailsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Determine time string:
-    final String timeText;
-    if (event.time != null && event.time!.trim().isNotEmpty) {
-      timeText = event.time!;
-    } else {
-      timeText = _formatTime(event.date);
-    }
+    final dateText = _formatDate(event.date);
 
-    final String dateText = _formatDate(event.date);
-    final String locationText = (event.location == null || event.location!.trim().isEmpty)
+    final timeText = (event.time != null && event.time!.trim().isNotEmpty)
+        ? event.time!
+        : _formatTime(event.date);
+
+    final locationText = (event.location == null || event.location!.trim().isEmpty)
         ? "Lokasi belum ditentukan"
         : event.location!;
 
@@ -40,130 +36,134 @@ class EventDetailsPage extends StatelessWidget {
         centerTitle: true,
         elevation: 0,
       ),
-      body: ListView(
-        children: [
-          if (event.imageUrl != null && event.imageUrl!.isNotEmpty)
-            ClipRRect(
-              borderRadius: const BorderRadius.only(
-                bottomLeft: Radius.circular(18),
-                bottomRight: Radius.circular(18),
-              ),
-              child: Image.network(
-                event.imageUrl!,
-                height: 300,
-                width: double.infinity,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => Container(
-                  height: 200,
-                  color: Colors.grey.shade900,
-                  alignment: Alignment.center,
-                  child: const Icon(Icons.broken_image, size: 48, color: Colors.white30),
-                ),
-              ),
-            ),
 
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Title
-                Text(
-                  event.title,
-                  style: const TextStyle(
-                    fontSize: 26,
-                    fontWeight: FontWeight.bold,
+      // ⬇⬇⬇ MIRIP BANGET dengan NewsDetailPage ⬇⬇⬇
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // ======= IMAGE (SAMA) =======
+            if (event.imageUrl != null && event.imageUrl!.isNotEmpty)
+              ClipRRect(
+                borderRadius: const BorderRadius.only(
+                  bottomLeft: Radius.circular(18),
+                  bottomRight: Radius.circular(18),
+                ),
+                child: Image.network(
+                  event.imageUrl!,
+                  width: double.infinity,
+                  height: 300,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) => Container(
+                    height: 250,
+                    color: Colors.grey.shade900,
+                    alignment: Alignment.center,
+                    child: const Icon(Icons.broken_image, size: 48, color: Colors.white30),
                   ),
                 ),
+              ),
 
-                const SizedBox(height: 12),
-
-                // Row: date & time chips
-                Row(
-                  children: [
-                    _InfoChip(
-                      icon: Icons.calendar_today_outlined,
-                      label: dateText,
+            Padding(
+              padding: const EdgeInsets.all(18.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // ======= TITLE =======
+                  Text(
+                    event.title,
+                    style: const TextStyle(
+                      fontSize: 26,
+                      fontWeight: FontWeight.bold,
                     ),
-                    const SizedBox(width: 10),
-                    _InfoChip(
-                      icon: Icons.access_time,
-                      label: timeText,
-                    ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(height: 12),
 
-                const SizedBox(height: 12),
+                  // ======= DATE & TIME CHIPS =======
+                  Row(
+                    children: [
+                      _InfoChip(
+                        icon: Icons.calendar_today_outlined,
+                        label: dateText,
+                      ),
+                      const SizedBox(width: 10),
+                      _InfoChip(
+                        icon: Icons.access_time,
+                        label: timeText,
+                      ),
+                    ],
+                  ),
 
-                // Location
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Icon(Icons.location_on_outlined, size: 20, color: Colors.redAccent),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        locationText,
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.grey.shade200,
+                  const SizedBox(height: 12),
+
+                  // ======= LOCATION =======
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Icon(Icons.location_on_outlined, size: 20, color: Colors.redAccent),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          locationText,
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.grey.shade200,
+                          ),
                         ),
                       ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 20),
+                  const Divider(),
+
+                  // ======= DESCRIPTION =======
+                  const Text(
+                    "Deskripsi",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(height: 8),
+
+                  Text(
+                    (event.description == null || event.description!.trim().isEmpty)
+                        ? "Tidak ada deskripsi."
+                        : event.description!,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      height: 1.5,
                     ),
-                  ],
-                ),
+                  ),
 
-                const SizedBox(height: 18),
+                  const SizedBox(height: 22),
 
-                // Description header
-                const Text(
-                  "Deskripsi",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-                ),
-                const SizedBox(height: 8),
-
-                // Description body
-                Text(
-                  (event.description == null || event.description!.trim().isEmpty)
-                      ? "Tidak ada deskripsi."
-                      : event.description!,
-                  style: const TextStyle(fontSize: 15, height: 1.5),
-                ),
-
-                const SizedBox(height: 22),
-
-                // Optional actions (edit/join) — contoh tombol
-                Row(
-                  children: [
-                    ElevatedButton.icon(
-                      onPressed: () {
-                        // contoh action: buka peta / share / register
-                      },
-                      icon: const Icon(Icons.map_outlined),
-                      label: const Text("Buka di Peta"),
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  // ======= ACTION BUTTONS =======
+                  Row(
+                    children: [
+                      ElevatedButton.icon(
+                        onPressed: () {},
+                        icon: const Icon(Icons.map_outlined),
+                        label: const Text("Buka di Peta"),
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 12),
-                    OutlinedButton.icon(
-                      onPressed: () {
-                        // contoh action: share / daftar
-                      },
-                      icon: const Icon(Icons.share),
-                      label: const Text("Bagikan"),
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      const SizedBox(width: 12),
+                      OutlinedButton.icon(
+                        onPressed: () {},
+                        icon: const Icon(Icons.share),
+                        label: const Text("Bagikan"),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ],
+                    ],
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
