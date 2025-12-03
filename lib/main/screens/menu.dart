@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:dribbl_id/main/widget/navbar.dart';
 import 'package:dribbl_id/main/screens/home_page.dart';
+// Import halaman baru
+import 'package:dribbl_id/matches/screens/match_schedule.dart'; 
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -20,15 +22,13 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Define a variable to hold the current page widget
     Widget bodyContent;
 
     if (_currentIndex == 0) {
       bodyContent = const HomePage();
     } else if (_currentIndex == 1) {
-      bodyContent = const Center(
-        child: Text("Matches Page", style: TextStyle(color: Colors.white)),
-      );
+      // Ubah bagian ini untuk menggunakan halaman baru
+      bodyContent = const MatchSchedulePage(); 
     } else if (_currentIndex == 2) {
       bodyContent = const Center(
         child: Text("News Page", style: TextStyle(color: Colors.white)),
@@ -44,7 +44,7 @@ class _MainPageState extends State<MainPage> {
     }
 
     return Scaffold(
-      backgroundColor: Colors.black, // Ensure the main scaffold is dark
+      backgroundColor: Colors.black,
       body: bodyContent,
       bottomNavigationBar: BottomNavBar(
         currentIndex: _currentIndex,
