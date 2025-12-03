@@ -28,7 +28,7 @@ class OthersPage extends StatelessWidget {
                   Text(
                     "Explore",
                     style: TextStyle(
-                      color: Colors.white,
+                      color: Colors.cyanAccent, // Use distinct cyan
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 1.0,
