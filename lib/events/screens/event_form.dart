@@ -2,9 +2,12 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
+import '../models/event.dart';
 
 class EventFormPage extends StatefulWidget {
-  const EventFormPage({super.key});
+  final Event? event; // Null = create mode, not null = edit mode
+
+  const EventFormPage({super.key, this.event});
 
   @override
   State<EventFormPage> createState() => _EventFormPageState();
@@ -13,13 +16,38 @@ class EventFormPage extends StatefulWidget {
 class _EventFormPageState extends State<EventFormPage> {
   final _formKey = GlobalKey<FormState>();
 
-  String _title = "";
-  String _description = "";
-  String _location = "";
-  String _time = "";
-  String _imageUrl = "";
-  DateTime _date = DateTime.now();
-  bool _isPublic = true;
+  late String _title;
+  late String _description;
+  late String _location;
+  late String _time;
+  late String _imageUrl;
+  late DateTime _date;
+  late bool _isPublic;
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize with existing event data if in edit mode
+    if (widget.event != null) {
+      _title = widget.event!.title;
+      _description = widget.event!.description;
+      _location = widget.event!.location;
+      _time = widget.event!.time;
+      _imageUrl = widget.event!.imageUrl;
+      _date = widget.event!.date;
+      _isPublic = widget.event!.isPublic;
+    } else {
+      _title = "";
+      _description = "";
+      _location = "";
+      _time = "";
+      _imageUrl = "";
+      _date = DateTime.now();
+      _isPublic = true;
+    }
+  }
+
+  bool get isEditMode => widget.event != null;
 
   Future pickDate() async {
     final selected = await showDatePicker(
@@ -40,7 +68,7 @@ class _EventFormPageState extends State<EventFormPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Tambah Event"),
+        title: Text(isEditMode ? "Edit Event" : "Tambah Event"),
         backgroundColor: Colors.indigo,
         foregroundColor: Colors.white,
       ),
@@ -54,6 +82,7 @@ class _EventFormPageState extends State<EventFormPage> {
 
               // === Title ===
               TextFormField(
+                initialValue: _title,
                 decoration: InputDecoration(
                   labelText: "Judul Event",
                   border: OutlineInputBorder(
@@ -68,6 +97,7 @@ class _EventFormPageState extends State<EventFormPage> {
 
               // === Description ===
               TextFormField(
+                initialValue: _description,
                 decoration: InputDecoration(
                   labelText: "Deskripsi",
                   border: OutlineInputBorder(
@@ -83,6 +113,7 @@ class _EventFormPageState extends State<EventFormPage> {
 
               // === Location ===
               TextFormField(
+                initialValue: _location,
                 decoration: InputDecoration(
                   labelText: "Lokasi",
                   border: OutlineInputBorder(
@@ -95,6 +126,7 @@ class _EventFormPageState extends State<EventFormPage> {
 
               // === Time ===
               TextFormField(
+                initialValue: _time,
                 decoration: InputDecoration(
                   labelText: "Waktu (contoh: 18:00 WIB)",
                   border: OutlineInputBorder(
@@ -107,6 +139,7 @@ class _EventFormPageState extends State<EventFormPage> {
 
               // === Image URL ===
               TextFormField(
+                initialValue: _imageUrl,
                 decoration: InputDecoration(
                   labelText: "Image URL",
                   border: OutlineInputBorder(
@@ -152,8 +185,12 @@ class _EventFormPageState extends State<EventFormPage> {
                 ),
                 onPressed: () async {
                   if (_formKey.currentState!.validate()) {
+                    final url = isEditMode
+                        ? "http://localhost:8000/events/${widget.event?.id}/edit/"
+                        : "http://localhost:8000/events/create-flutter/";
+
                     final response = await request.postJson(
-                      "http://localhost:8000/events/create-flutter/",
+                      url,
                       jsonEncode({
                         "title": _title,
                         "description": _description,
@@ -169,20 +206,26 @@ class _EventFormPageState extends State<EventFormPage> {
 
                     if (response["status"] == "success") {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                            content: Text("Event berhasil disimpan!")),
+                        SnackBar(
+                            content: Text(isEditMode
+                                ? "Event berhasil diupdate!"
+                                : "Event berhasil disimpan!")),
                       );
-                      Navigator.pop(context);
+                      Navigator.pop(context, true);
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                            content: Text("Gagal menyimpan event.")),
+                        SnackBar(
+                            content: Text(isEditMode
+                                ? "Gagal mengupdate event."
+                                : "Gagal menyimpan event.")),
                       );
                     }
                   }
                 },
-                child: const Text("Simpan Event",
-                    style: TextStyle(color: Colors.white)),
+                child: Text(
+                  isEditMode ? "Update Event" : "Simpan Event",
+                  style: const TextStyle(color: Colors.white),
+                ),
               ),
             ],
           ),

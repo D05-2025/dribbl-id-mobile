@@ -24,6 +24,54 @@ class _EventListPageState extends State<EventListPage> {
     return events;
   }
 
+  Future<void> deleteEvent(CookieRequest request, int eventId) async {
+    try {
+      final response = await request.post(
+        "http://localhost:8000/events/$eventId/delete/",
+        {},
+      );
+
+      if (response['status'] == 'success') {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Event berhasil dihapus!")),
+          );
+          setState(() {}); // Refresh list
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Error: $e")),
+        );
+      }
+    }
+  }
+
+  void showDeleteConfirmation(CookieRequest request, Event event) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Hapus Event"),
+        content: Text("Yakin ingin menghapus event '${event.title}'?"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Batal"),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              deleteEvent(request, event.id);
+            },
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text("Hapus"),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
@@ -65,6 +113,20 @@ class _EventListPageState extends State<EventListPage> {
                       builder: (_) => EventDetailsPage(event: event),
                     ),
                   );
+                },
+                onEdit: () {
+                  // Navigate to edit page
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => EventFormPage(event: event),
+                    ),
+                  ).then((result) {
+                    if (result == true) setState(() {});
+                  });
+                },
+                onDelete: () {
+                  showDeleteConfirmation(request, event);
                 },
               );
             },
