@@ -35,7 +35,7 @@ class News {
     title: json["title"],
     content: json["content"],
     category: json["category"],
-    thumbnail: json["thumbnail"],
+    thumbnail: json["thumbnail"] ?? "",
     createdAt: DateTime.parse(json["created_at"]),
   );
 

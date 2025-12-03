@@ -15,7 +15,7 @@ class _NewsFormPageState extends State<NewsFormPage> {
 
   String _title = "";
   String _content = "";
-  String _category = "nba"; // default value
+  String _category = "";
   String _thumbnail = "";
 
   final List<String> _categories = [
@@ -44,8 +44,6 @@ class _NewsFormPageState extends State<NewsFormPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-
-              // === Title ===
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextFormField(
@@ -56,12 +54,12 @@ class _NewsFormPageState extends State<NewsFormPage> {
                       borderRadius: BorderRadius.circular(5.0),
                     ),
                   ),
-                  onChanged: (String? value){
+                  onChanged: (String? value) {
                     setState(() {
                       _title = value!;
                     });
                   },
-                  validator: (String? value){
+                  validator: (String? value) {
                     if (value == null || value.isEmpty) {
                       return "Judul tidak boleh kosong!";
                     }
@@ -70,7 +68,6 @@ class _NewsFormPageState extends State<NewsFormPage> {
                 ),
               ),
 
-              // === Content ===
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextFormField(
@@ -82,12 +79,12 @@ class _NewsFormPageState extends State<NewsFormPage> {
                       borderRadius: BorderRadius.circular(5.0),
                     ),
                   ),
-                  onChanged: (String? value){
+                  onChanged: (String? value) {
                     setState(() {
                       _content = value!;
                     });
                   },
-                  validator: (String? value){
+                  validator: (String? value) {
                     if (value == null || value.isEmpty) {
                       return "Isi berita tidak boleh kosong!";
                     }
@@ -96,7 +93,6 @@ class _NewsFormPageState extends State<NewsFormPage> {
                 ),
               ),
 
-              // === Category Dropdown ===
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: DropdownButtonFormField<String>(
@@ -106,12 +102,13 @@ class _NewsFormPageState extends State<NewsFormPage> {
                       borderRadius: BorderRadius.circular(5.0),
                     ),
                   ),
-                  value: _category,
                   items: _categories
-                      .map((cat) => DropdownMenuItem(
-                    value: cat,
-                    child: Text(cat[0].toUpperCase() + cat.substring(1)),
-                  ))
+                      .map(
+                        (cat) => DropdownMenuItem(
+                          value: cat,
+                          child: Text(cat[0].toUpperCase() + cat.substring(1)),
+                        ),
+                      )
                       .toList(),
                   onChanged: (String? newValue) {
                     setState(() {
@@ -121,7 +118,6 @@ class _NewsFormPageState extends State<NewsFormPage> {
                 ),
               ),
 
-              // === Thumbnail ===
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextFormField(
@@ -132,7 +128,7 @@ class _NewsFormPageState extends State<NewsFormPage> {
                       borderRadius: BorderRadius.circular(5.0),
                     ),
                   ),
-                  onChanged: (String? value){
+                  onChanged: (String? value) {
                     setState(() {
                       _thumbnail = value!;
                     });
@@ -140,7 +136,6 @@ class _NewsFormPageState extends State<NewsFormPage> {
                 ),
               ),
 
-              // === Save Button ===
               Align(
                 alignment: Alignment.bottomCenter,
                 child: Padding(
@@ -153,13 +148,12 @@ class _NewsFormPageState extends State<NewsFormPage> {
                     onPressed: () async {
                       if (_formKey.currentState!.validate()) {
                         final response = await request.postJson(
-                          "http://localhost:8000/create-flutter/",
+                          "http://localhost:8000/news/create-flutter/",
                           jsonEncode({
                             "title": _title,
                             "content": _content,
                             "thumbnail": _thumbnail,
                             "category": _category,
-                            "is_featured": false, // versi kamu tidak punya ini
                           }),
                         );
 
@@ -188,7 +182,6 @@ class _NewsFormPageState extends State<NewsFormPage> {
                   ),
                 ),
               ),
-
             ],
           ),
         ),

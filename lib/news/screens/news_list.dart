@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
-
-import 'package:dribbl_id/news/models/news.dart';        // ← yang benar
-import 'package:dribbl_id/news/widgets/news_card.dart';  // pastikan sesuai struktur folder
-import 'package:dribbl_id/news/screens/news_details.dart'; 
-
+import 'package:dribbl_id/news/models/news.dart';
+import 'package:dribbl_id/news/widgets/news_card.dart';
+import 'package:dribbl_id/news/screens/news_details.dart';
+import 'package:dribbl_id/news/screens/news_form.dart';
 
 class NewsEntryListPage extends StatefulWidget {
   const NewsEntryListPage({super.key});
@@ -16,8 +15,8 @@ class NewsEntryListPage extends StatefulWidget {
 
 class _NewsEntryListPageState extends State<NewsEntryListPage> {
   Future<List<News>> fetchNews(CookieRequest request) async {
-    final response = await request.get('http://localhost:8000/json/');
 
+    final response = await request.get('http://localhost:8000/news/json/');
     List<News> listNews = [];
     for (var d in response) {
       if (d != null) {
@@ -30,11 +29,25 @@ class _NewsEntryListPageState extends State<NewsEntryListPage> {
   @override
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
-
+    
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('News List'),
-      ),
+      appBar: AppBar(title: const Text('News List')),
+      floatingActionButton: 
+        request.jsonData["role"] == 'admin' 
+            ? FloatingActionButton(
+                backgroundColor: Colors.black,
+                onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const NewsFormPage(),
+                  ),
+                );
+              },
+
+                child: const Icon(Icons.add, color: Colors.white),
+              )
+            : null,
       body: FutureBuilder(
         future: fetchNews(request),
         builder: (context, AsyncSnapshot<List<News>> snapshot) {
