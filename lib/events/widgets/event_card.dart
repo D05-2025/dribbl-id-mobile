@@ -24,6 +24,11 @@ class _EventCardState extends State<EventCard> {
   bool isHovered = false;
   bool hoverActions = false;
 
+  String get formattedDate {
+    final d = widget.event.date;
+    return "${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}";
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
@@ -76,13 +81,8 @@ class _EventCardState extends State<EventCard> {
                 borderRadius: BorderRadius.circular(isMobile ? 16 : 22),
                 child: Stack(
                   children: [
-                    // RESPONSIVE LAYOUT
                     isMobile ? _buildMobileLayout() : _buildDesktopLayout(),
-
-                    // SHINE ANIMATION
                     if (!isMobile) _buildShineAnimation(cardWidth),
-
-                    // ACTION BUTTONS
                     _buildActionButtons(isMobile),
                   ],
                 ),
@@ -133,7 +133,6 @@ class _EventCardState extends State<EventCard> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // Image at top
         if (widget.event.imageUrl.isNotEmpty)
           Image.network(
             widget.event.imageUrl,
@@ -146,8 +145,6 @@ class _EventCardState extends State<EventCard> {
             color: Colors.grey.shade800,
             child: const Icon(Icons.image, color: Colors.white30, size: 40),
           ),
-
-        // Content below
         Padding(
           padding: const EdgeInsets.all(16),
           child: _buildContent(isMobile: true),
@@ -156,7 +153,7 @@ class _EventCardState extends State<EventCard> {
     );
   }
 
-  // Content (reusable for both layouts)
+  // Content
   Widget _buildContent({bool isMobile = false}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -179,10 +176,11 @@ class _EventCardState extends State<EventCard> {
           ),
         ),
         SizedBox(height: isMobile ? 8 : 10),
-        if (widget.event.description != null &&
-            widget.event.description!.isNotEmpty)
+
+        // 🔥 description tidak null (model kamu tidak nullable)
+        if (widget.event.description.isNotEmpty)
           Text(
-            widget.event.description!,
+            widget.event.description,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
@@ -191,6 +189,7 @@ class _EventCardState extends State<EventCard> {
               height: 1.4,
             ),
           ),
+
         SizedBox(height: isMobile ? 10 : 14),
         _info(Icons.location_on_outlined, widget.event.location),
         const SizedBox(height: 8),
@@ -290,11 +289,13 @@ class _EventCardState extends State<EventCard> {
       children: [
         Icon(icon, size: 18, color: Colors.grey.shade400),
         const SizedBox(width: 8),
-        Text(text,
-            style: TextStyle(
-              color: Colors.grey.shade300,
-              fontSize: 16,
-            )),
+        Text(
+          text,
+          style: TextStyle(
+            color: Colors.grey.shade300,
+            fontSize: 16,
+          ),
+        ),
       ],
     );
   }
@@ -336,7 +337,7 @@ class _EventCardState extends State<EventCard> {
           ),
           const SizedBox(width: 6),
           Text(
-            "${widget.event.date.toLocal()}".split(" ")[0],
+            formattedDate,
             style: const TextStyle(
               color: Colors.white,
               fontSize: 13,
@@ -348,10 +349,11 @@ class _EventCardState extends State<EventCard> {
     );
   }
 
-  Widget _appleActionBtn(IconData icon, {
-    Color color = Colors.white,
-    required VoidCallback onTap,
-  }) {
+  Widget _appleActionBtn(
+      IconData icon, {
+        Color color = Colors.white,
+        required VoidCallback onTap,
+      }) {
     return GestureDetector(
       onTap: onTap,
       child: ClipRRect(
