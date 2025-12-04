@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:dribbl_id/main/widget/navbar.dart';
 import 'package:dribbl_id/main/screens/home_page.dart';
 // Import halaman baru
-import 'package:dribbl_id/matches/screens/match_schedule.dart'; 
+import 'package:dribbl_id/matches/screens/match_schedule.dart';
+import 'package:dribbl_id/news/screens/news_list.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -28,11 +29,9 @@ class _MainPageState extends State<MainPage> {
       bodyContent = const HomePage();
     } else if (_currentIndex == 1) {
       // Ubah bagian ini untuk menggunakan halaman baru
-      bodyContent = const MatchSchedulePage(); 
+      bodyContent = const MatchSchedulePage();
     } else if (_currentIndex == 2) {
-      bodyContent = const Center(
-        child: Text("News Page", style: TextStyle(color: Colors.white)),
-      );
+      bodyContent = const NewsEntryListPage();
     } else if (_currentIndex == 3) {
       bodyContent = const Center(
         child: Text("Events Page", style: TextStyle(color: Colors.white)),
