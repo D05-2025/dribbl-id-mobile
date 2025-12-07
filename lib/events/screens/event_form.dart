@@ -3,8 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 
+import '../models/event.dart';
+
 class EventFormPage extends StatefulWidget {
-  const EventFormPage({super.key});
+  final Event? event;   // null → create, not null → edit
+
+  const EventFormPage({super.key, this.event});
 
   @override
   State<EventFormPage> createState() => _EventFormPageState();
@@ -13,13 +17,31 @@ class EventFormPage extends StatefulWidget {
 class _EventFormPageState extends State<EventFormPage> {
   final _formKey = GlobalKey<FormState>();
 
-  String _title = "";
-  String _description = "";
-  String _location = "";
-  String _time = "";
-  String _imageUrl = "";
+  // Controllers untuk prefill
+  late TextEditingController _titleController;
+  late TextEditingController _descriptionController;
+  late TextEditingController _locationController;
+  late TextEditingController _timeController;
+  late TextEditingController _imageUrlController;
+
   DateTime _date = DateTime.now();
   bool _isPublic = true;
+
+  @override
+  void initState() {
+    super.initState();
+
+    final e = widget.event;
+
+    _titleController = TextEditingController(text: e?.title ?? "");
+    _descriptionController = TextEditingController(text: e?.description ?? "");
+    _locationController = TextEditingController(text: e?.location ?? "");
+    _timeController = TextEditingController(text: e?.time ?? "");
+    _imageUrlController = TextEditingController(text: e?.imageUrl ?? "");
+
+    _date = e?.date ?? DateTime.now();
+    _isPublic = e?.isPublic ?? true;
+  }
 
   Future<void> _pickDate() async {
     final selected = await showDatePicker(
@@ -40,7 +62,9 @@ class _EventFormPageState extends State<EventFormPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Center(child: Text("Tambah Event")),
+        title: Center(
+          child: Text(widget.event == null ? "Tambah Event" : "Edit Event"),
+        ),
         backgroundColor: Colors.indigo,
         foregroundColor: Colors.white,
       ),
@@ -57,13 +81,13 @@ class _EventFormPageState extends State<EventFormPage> {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextFormField(
+                  controller: _titleController,
                   decoration: InputDecoration(
                     labelText: "Judul Event",
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(5.0),
                     ),
                   ),
-                  onChanged: (v) => _title = v,
                   validator: (v) {
                     if (v == null || v.isEmpty) {
                       return "Judul tidak boleh kosong!";
@@ -77,6 +101,7 @@ class _EventFormPageState extends State<EventFormPage> {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextFormField(
+                  controller: _descriptionController,
                   maxLines: 4,
                   decoration: InputDecoration(
                     labelText: "Deskripsi Event",
@@ -84,7 +109,6 @@ class _EventFormPageState extends State<EventFormPage> {
                       borderRadius: BorderRadius.circular(5.0),
                     ),
                   ),
-                  onChanged: (v) => _description = v,
                   validator: (v) {
                     if (v == null || v.isEmpty) {
                       return "Deskripsi tidak boleh kosong!";
@@ -98,13 +122,13 @@ class _EventFormPageState extends State<EventFormPage> {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextFormField(
+                  controller: _locationController,
                   decoration: InputDecoration(
                     labelText: "Lokasi",
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(5.0),
                     ),
                   ),
-                  onChanged: (v) => _location = v,
                 ),
               ),
 
@@ -112,13 +136,13 @@ class _EventFormPageState extends State<EventFormPage> {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextFormField(
+                  controller: _timeController,
                   decoration: InputDecoration(
                     labelText: "Waktu (contoh: 18:00 WIB)",
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(5.0),
                     ),
                   ),
-                  onChanged: (v) => _time = v,
                 ),
               ),
 
@@ -126,13 +150,13 @@ class _EventFormPageState extends State<EventFormPage> {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextFormField(
+                  controller: _imageUrlController,
                   decoration: InputDecoration(
                     labelText: "Image URL",
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(5.0),
                     ),
                   ),
-                  onChanged: (v) => _imageUrl = v,
                 ),
               ),
 
@@ -173,36 +197,59 @@ class _EventFormPageState extends State<EventFormPage> {
 
                   child: ElevatedButton(
                     style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(Colors.indigo),
+                      backgroundColor:
+                      MaterialStateProperty.all(Colors.indigo),
                     ),
                     onPressed: () async {
                       if (_formKey.currentState!.validate()) {
-                        final response = await request.postJson(
-                          "http://localhost:8000/events/create-flutter/",
-                          jsonEncode({
-                            "title": _title,
-                            "description": _description,
-                            "location": _location,
-                            "date": _date.toIso8601String(),
-                            "time": _time,
-                            "image_url": _imageUrl,
-                            "is_public": _isPublic,
-                          }),
-                        );
+                        final body = {
+                          "title": _titleController.text,
+                          "description": _descriptionController.text,
+                          "location": _locationController.text,
+                          "date": _date.toIso8601String(),
+                          "time": _timeController.text,
+                          "image_url": _imageUrlController.text,
+                          "is_public": _isPublic,
+                        };
 
-                        if (context.mounted) {
-                          if (response['status'] == 'success') {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                  content: Text("Event berhasil disimpan!")),
-                            );
-                            Navigator.pop(context);
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                  content: Text("Gagal menyimpan event.")),
-                            );
-                          }
+                        late final response;
+
+                        // === UPDATE MODE ===
+                        if (widget.event != null) {
+                          response = await request.postJson(
+                            "http://localhost:8000/events/update-flutter/",
+                            jsonEncode({
+                              "id": widget.event!.id,
+                              ...body,
+                            }),
+                          );
+
+                          // === CREATE MODE ===
+                        } else {
+                          response = await request.postJson(
+                            "http://localhost:8000/events/create-flutter/",
+                            jsonEncode(body),
+                          );
+                        }
+
+                        if (!context.mounted) return;
+
+                        if (response['status'] == 'success') {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                widget.event == null
+                                    ? "Event berhasil dibuat!"
+                                    : "Event berhasil diperbarui!",
+                              ),
+                            ),
+                          );
+                          Navigator.pop(context, true);  // ← kirim true ke halaman sebelumnya
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text("Gagal menyimpan event.")),
+                          );
                         }
                       }
                     },

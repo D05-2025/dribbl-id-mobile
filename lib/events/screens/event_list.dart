@@ -29,10 +29,10 @@ class _EventListPageState extends State<EventListPage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => EventFormPage(),
+        builder: (_) => EventFormPage(event: event),  // ← kirim event
       ),
     ).then((value) {
-      if (value == true) setState(() {});
+      if (value == true) setState(() {});  // refresh list kalau perlu
     });
   }
 
@@ -40,33 +40,14 @@ class _EventListPageState extends State<EventListPage> {
     final request = context.read<CookieRequest>();
 
     try {
-      // 🔥 Kirim ID lewat JSON body, bukan URL parameter
-      final response = await request.postJson(
+      final response = await request.post(
         "http://localhost:8000/events/delete-flutter/",
-        jsonEncode({"id": id}),
+        {"id": id.toString()},
       );
 
       if (!mounted) return;
 
-      if (response is Map) {
-        if (response['status'] == 'success' || response['message']?.contains('berhasil') == true) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text("Event berhasil dihapus!"),
-              backgroundColor: Colors.green,
-            ),
-          );
-          setState(() {}); // refresh list
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(response['message'] ?? response['error'] ?? "Gagal menghapus event"),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
-      } else {
-        // Jika response bukan Map, anggap sukses
+      if (response['status'] == 'success') {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text("Event berhasil dihapus!"),
@@ -74,23 +55,21 @@ class _EventListPageState extends State<EventListPage> {
           ),
         );
         setState(() {});
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(response['message'] ?? "Gagal menghapus event"),
+            backgroundColor: Colors.red,
+          ),
+        );
       }
     } catch (e) {
       if (!mounted) return;
 
-      // 🔥 Parse error message
-      String errorMsg = "Error: $e";
-      if (e.toString().contains('403')) {
-        errorMsg = "Akses ditolak! Hanya admin yang dapat menghapus event.";
-      } else if (e.toString().contains('404')) {
-        errorMsg = "Event tidak ditemukan.";
-      }
-
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(errorMsg),
+          content: Text("Error: $e"),
           backgroundColor: Colors.red,
-          duration: const Duration(seconds: 4),
         ),
       );
     }

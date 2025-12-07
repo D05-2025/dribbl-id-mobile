@@ -177,7 +177,7 @@ class _EventCardState extends State<EventCard> {
         ),
         SizedBox(height: isMobile ? 8 : 10),
 
-        // 🔥 description tidak null (model kamu tidak nullable)
+        // description tidak null (model kamu tidak nullable)
         if (widget.event.description.isNotEmpty)
           Text(
             widget.event.description,
