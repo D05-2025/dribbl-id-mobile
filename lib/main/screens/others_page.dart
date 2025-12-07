@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:dribbl_id/main/screens/login.dart'; // Import the Login Page
+import 'package:dribbl_id/teams/screens/team_page.dart';
 
 class OthersPage extends StatelessWidget {
   const OthersPage({super.key});
@@ -76,7 +77,13 @@ class OthersPage extends StatelessWidget {
                 title: "Teams",
                 subtitle: "Explore basketball teams",
                 onTap: () {
-                  // Navigate to Teams page logic here
+                  // Navigate to Teams Page
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const TeamsPage(),
+                    ),
+                  );
                 },
               ),
 
