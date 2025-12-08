@@ -300,14 +300,15 @@ class _EventCardState extends State<EventCard> {
     );
   }
 
+  // Menyesuaikan badge "Public" agar lebih seragam
   Widget _buildBadge() {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
         color: widget.event.isPublic
             ? Colors.greenAccent.shade700
             : Colors.orange.shade700,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(8), // border radius dikurangi
       ),
       child: Text(
         widget.event.isPublic ? "Public" : "Private",
@@ -320,12 +321,13 @@ class _EventCardState extends State<EventCard> {
     );
   }
 
+  // Menyesuaikan badge "Tanggal" agar lebih seragam
   Widget _buildDateBadge() {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
         color: Colors.blueGrey.shade700,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(8), // border radius dikurangi
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

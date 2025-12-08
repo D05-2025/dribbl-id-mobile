@@ -126,7 +126,7 @@ class _EventListPageState extends State<EventListPage> {
 
     // ====== cek lebar layar, kalau kecil pakai mode ikon ======
     final screenWidth = MediaQuery.of(context).size.width;
-    final bool isCompact = screenWidth < 500; // boleh kamu tweak angkanya
+    final bool isCompact = screenWidth < 430; // 👈 dinaikkan, 400px sudah ikon-only
 
     // daftar item dropdown filter (dipakai di 2 mode: normal & compact)
     final filterItems = [
@@ -215,16 +215,24 @@ class _EventListPageState extends State<EventListPage> {
                     child: TextField(
                       style: _topBarTextStyle,
                       textAlignVertical: TextAlignVertical.center,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
+                        isDense: true, // biar lebih rapat dan ketengah
                         hintText: "Cari event atau lokasi...",
-                        hintStyle: TextStyle(
-                          color: Colors.white70,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w500,
+                        hintStyle: _topBarTextStyle.copyWith(
+                          color: Colors.white,
                         ),
-                        prefixIcon: Icon(Icons.search, color: Colors.white70),
+                        prefixIcon: const Icon(
+                          Icons.search,
+                          color: Colors.white, // samain juga ikon search-nya
+                        ),
+                        prefixIconConstraints: const BoxConstraints(
+                          minWidth: 32,
+                          minHeight: 32,
+                        ),
                         border: InputBorder.none,
-                        contentPadding: EdgeInsets.symmetric(vertical: 0),
+                        contentPadding: const EdgeInsets.symmetric(
+                          vertical: 12, // Penyesuaian vertical
+                        ),
                       ),
                       onChanged: (value) {
                         setState(() => _searchQuery = value);
@@ -277,6 +285,8 @@ class _EventListPageState extends State<EventListPage> {
                             // ===== mode normal: teks + arrow =====
                                 : DropdownButton<String>(
                               isDense: true,
+                              isExpanded:
+                              true, // 👈 biar muat di lebar kontainer
                               value: _filterOption,
                               dropdownColor: Colors.grey[900],
                               icon: const Icon(
@@ -328,12 +338,17 @@ class _EventListPageState extends State<EventListPage> {
                               mainAxisAlignment:
                               MainAxisAlignment.spaceBetween,
                               children: [
-                                Text(
-                                  _sortAsc
-                                      ? "Terdekat dulu"
-                                      : "Terjauh dulu",
-                                  style: _topBarTextStyle,
+                                Expanded( // 👈 kasih flex biar gak overflow
+                                  child: Text(
+                                    _sortAsc
+                                        ? "Terdekat dulu"
+                                        : "Terjauh dulu",
+                                    style: _topBarTextStyle,
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
+                                  ),
                                 ),
+                                const SizedBox(width: 4),
                                 Icon(
                                   _sortAsc
                                       ? Icons.arrow_downward
