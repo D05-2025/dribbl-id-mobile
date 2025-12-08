@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
-
 import 'package:dribbl_id/news/models/news.dart';
 import 'package:dribbl_id/news/widgets/news_card.dart';
 import 'package:dribbl_id/news/screens/news_details.dart';
@@ -16,9 +15,8 @@ class NewsEntryListPage extends StatefulWidget {
 
 class _NewsEntryListPageState extends State<NewsEntryListPage> {
   Future<List<News>> fetchNews(CookieRequest request) async {
-    final response =
-        await request.get('http://localhost:8000/news/json/');
 
+    final response = await request.get('http://localhost:8000/news/json/');
     List<News> listNews = [];
     for (var d in response) {
       if (d != null) {
@@ -28,123 +26,58 @@ class _NewsEntryListPageState extends State<NewsEntryListPage> {
     return listNews;
   }
 
-  Future<void> deleteNews(
-      CookieRequest request, String id) async {
-    final response = await request.post(
-      'http://localhost:8000/news/delete-news-ajax/$id/',
-      {},
-    );
-
-    if (response['status'] == 'success') {
-      setState(() {});
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
-    final bool isAdmin = request.jsonData['role'] == 'admin';
-
+    
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('News List'),
-      ),
-
-      // ✅ FAB cuma admin
-      floatingActionButton: isAdmin
-          ? FloatingActionButton(
-              backgroundColor: Colors.black,
-              child: const Icon(Icons.add, color: Colors.white),
-              onPressed: () async {
-                await Navigator.push(
+      appBar: AppBar(title: const Text('News List')),
+      floatingActionButton: 
+        request.jsonData["role"] == 'admin' 
+            ? FloatingActionButton(
+                backgroundColor: Colors.black,
+                onPressed: () {
+                Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => const NewsFormPage(),
+                    builder: (context) => const NewsFormPage(),
                   ),
                 );
-                setState(() {});
               },
-            )
-          : null,
 
-      body: FutureBuilder<List<News>>(
+                child: const Icon(Icons.add, color: Colors.white),
+              )
+            : null,
+      body: FutureBuilder(
         future: fetchNews(request),
-        builder: (context, snapshot) {
+        builder: (context, AsyncSnapshot<List<News>> snapshot) {
           if (!snapshot.hasData) {
             return const Center(child: CircularProgressIndicator());
           }
 
           if (snapshot.data!.isEmpty) {
             return const Center(
-              child: Text('Tidak ada news ditemukan.'),
+              child: Text(
+                'Tidak ada news ditemukan.',
+                style: TextStyle(fontSize: 18),
+              ),
             );
           }
 
           return ListView.builder(
             itemCount: snapshot.data!.length,
             itemBuilder: (_, index) {
-              final news = snapshot.data![index];
-
+              final item = snapshot.data![index];
               return NewsCard(
-                news: news,
-
-                // ✅ Tap = see details (AMAN, BALIK LAGI)
+                news: item,
                 onTap: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => NewsDetailPage(news: news),
+                      builder: (_) => NewsDetailPage(news: item),
                     ),
                   );
                 },
-
-                // ✅ Admin only
-                onEdit: isAdmin
-                    ? () async {
-                        await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => NewsFormPage(
-                              news: news, // <- edit mode
-                            ),
-                          ),
-                        );
-                        setState(() {});
-                      }
-                    : null,
-
-                onDelete: isAdmin
-                    ? () async {
-                        final confirm = await showDialog<bool>(
-                          context: context,
-                          builder: (ctx) => AlertDialog(
-                            title: const Text('Hapus News'),
-                            content: const Text(
-                                'Yakin mau menghapus news ini?'),
-                            actions: [
-                              TextButton(
-                                child: const Text('Batal'),
-                                onPressed: () =>
-                                    Navigator.pop(ctx, false),
-                              ),
-                              TextButton(
-                                child: const Text(
-                                  'Hapus',
-                                  style: TextStyle(color: Colors.red),
-                                ),
-                                onPressed: () =>
-                                    Navigator.pop(ctx, true),
-                              ),
-                            ],
-                          ),
-                        );
-
-                        if (confirm == true) {
-                          await deleteNews(
-                              request, news.id.toString());
-                        }
-                      }
-                    : null,
               );
             },
           );

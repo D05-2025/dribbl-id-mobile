@@ -1,14 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'dart:convert';
-
-import 'package:dribbl_id/news/models/news.dart';
+import 'package:provider/provider.dart';
 
 class NewsFormPage extends StatefulWidget {
-  final News? news; 
-
-  const NewsFormPage({super.key, this.news});
+  const NewsFormPage({super.key});
 
   @override
   State<NewsFormPage> createState() => _NewsFormPageState();
@@ -17,10 +13,10 @@ class NewsFormPage extends StatefulWidget {
 class _NewsFormPageState extends State<NewsFormPage> {
   final _formKey = GlobalKey<FormState>();
 
-  late String _title;
-  late String _content;
-  late String _category;
-  late String _thumbnail;
+  String _title = "";
+  String _content = "";
+  String _category = "";
+  String _thumbnail = "";
 
   final List<String> _categories = [
     'nba',
@@ -32,26 +28,16 @@ class _NewsFormPageState extends State<NewsFormPage> {
   ];
 
   @override
-  void initState() {
-    super.initState();
-
-    _title = widget.news?.title ?? '';
-    _content = widget.news?.content ?? '';
-    _category = widget.news?.category ?? '';
-    _thumbnail = widget.news?.thumbnail ?? '';
-  }
-
-  @override
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
-    final bool isEdit = widget.news != null;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(isEdit ? 'Edit News' : 'Add New News'),
+        title: const Center(child: Text('Add New News')),
         backgroundColor: Colors.black,
         foregroundColor: Colors.white,
       ),
+
       body: Form(
         key: _formKey,
         child: SingleChildScrollView(
@@ -61,45 +47,55 @@ class _NewsFormPageState extends State<NewsFormPage> {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextFormField(
-                  initialValue: _title,
                   decoration: InputDecoration(
+                    hintText: "Judul Berita",
                     labelText: "Judul Berita",
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(5.0),
                     ),
                   ),
-                  onChanged: (value) => _title = value,
-                  validator: (value) =>
-                      value == null || value.isEmpty
-                          ? "Judul tidak boleh kosong!"
-                          : null,
+                  onChanged: (String? value) {
+                    setState(() {
+                      _title = value!;
+                    });
+                  },
+                  validator: (String? value) {
+                    if (value == null || value.isEmpty) {
+                      return "Judul tidak boleh kosong!";
+                    }
+                    return null;
+                  },
                 ),
               ),
 
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextFormField(
-                  initialValue: _content,
                   maxLines: 5,
                   decoration: InputDecoration(
+                    hintText: "Isi Berita",
                     labelText: "Isi Berita",
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(5.0),
                     ),
                   ),
-                  onChanged: (value) => _content = value,
-                  validator: (value) =>
-                      value == null || value.isEmpty
-                          ? "Isi berita tidak boleh kosong!"
-                          : null,
+                  onChanged: (String? value) {
+                    setState(() {
+                      _content = value!;
+                    });
+                  },
+                  validator: (String? value) {
+                    if (value == null || value.isEmpty) {
+                      return "Isi berita tidak boleh kosong!";
+                    }
+                    return null;
+                  },
                 ),
               ),
 
-              // ✅ Category
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: DropdownButtonFormField<String>(
-                  value: _category.isEmpty ? null : _category,
                   decoration: InputDecoration(
                     labelText: "Kategori",
                     border: OutlineInputBorder(
@@ -110,76 +106,79 @@ class _NewsFormPageState extends State<NewsFormPage> {
                       .map(
                         (cat) => DropdownMenuItem(
                           value: cat,
-                          child: Text(
-                              cat[0].toUpperCase() + cat.substring(1)),
+                          child: Text(cat[0].toUpperCase() + cat.substring(1)),
                         ),
                       )
                       .toList(),
-                  onChanged: (value) => _category = value!,
-                  validator: (value) =>
-                      value == null || value.isEmpty
-                          ? "Kategori wajib dipilih!"
-                          : null,
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      _category = newValue!;
+                    });
+                  },
                 ),
               ),
 
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextFormField(
-                  initialValue: _thumbnail,
                   decoration: InputDecoration(
-                    labelText: "URL Thumbnail (opsional)",
+                    hintText: "URL Thumbnail (opsional)",
+                    labelText: "URL Thumbnail",
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(5.0),
                     ),
                   ),
-                  onChanged: (value) => _thumbnail = value,
+                  onChanged: (String? value) {
+                    setState(() {
+                      _thumbnail = value!;
+                    });
+                  },
                 ),
               ),
 
-              // ✅ SAVE BUTTON
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: ElevatedButton(
-                  style: ButtonStyle(
-                    backgroundColor:
-                        MaterialStateProperty.all(Colors.black),
-                    minimumSize: MaterialStateProperty.all(
-                      const Size(double.infinity, 48),
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+
+                  child: ElevatedButton(
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(Colors.black),
                     ),
-                  ),
-                  onPressed: () async {
-                    if (_formKey.currentState!.validate()) {
-                      final url = isEdit
-                          ? 'http://localhost:8000/news/edit-news-ajax/${widget.news!.id}/'
-                          : 'http://localhost:8000/news/create-flutter/';
-
-                      final response = await request.postJson(
-                        url,
-                        jsonEncode({
-                          'title': _title,
-                          'content': _content,
-                          'category': _category,
-                          'thumbnail': _thumbnail,
-                        }),
-                      );
-
-                      if (context.mounted &&
-                          response['status'] == 'success') {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(isEdit
-                                ? 'News updated!'
-                                : 'News created!'),
-                          ),
+                    onPressed: () async {
+                      if (_formKey.currentState!.validate()) {
+                        final response = await request.postJson(
+                          "http://localhost:8000/news/create-flutter/",
+                          jsonEncode({
+                            "title": _title,
+                            "content": _content,
+                            "thumbnail": _thumbnail,
+                            "category": _category,
+                          }),
                         );
-                        Navigator.pop(context);
+
+                        if (context.mounted) {
+                          if (response['status'] == 'success') {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text("News successfully saved!"),
+                              ),
+                            );
+                            Navigator.pop(context);
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text("Something went wrong."),
+                              ),
+                            );
+                          }
+                        }
                       }
-                    }
-                  },
-                  child: const Text(
-                    "Save",
-                    style: TextStyle(color: Colors.white),
+                    },
+                    child: const Text(
+                      "Save",
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
                 ),
               ),
