@@ -15,50 +15,42 @@ class NewsEntryListPage extends StatefulWidget {
 }
 
 class _NewsEntryListPageState extends State<NewsEntryListPage> {
-  late Future<List<News>> _newsFuture;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final request = context.read<CookieRequest>();
-    _newsFuture = fetchNews(request);
-  }
-
-  // ✅ FETCH
   Future<List<News>> fetchNews(CookieRequest request) async {
+    final response =
+        await request.get('http://localhost:8000/news/json/');
 
-    final response = await request.get('http://localhost:8000/news/json/');
     List<News> listNews = [];
     for (var d in response) {
-      listNews.add(News.fromJson(d));
+      if (d != null) {
+        listNews.add(News.fromJson(d));
+      }
     }
     return listNews;
   }
 
-  // ✅ DELETE
   Future<void> deleteNews(
       CookieRequest request, String id) async {
-    await request.post(
+    final response = await request.post(
       'http://localhost:8000/news/delete-news-ajax/$id/',
       {},
     );
-  }
 
-  void refreshList(CookieRequest request) {
-    setState(() {
-      _newsFuture = fetchNews(request);
-    });
+    if (response['status'] == 'success') {
+      setState(() {});
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
-    final isAdmin = request.jsonData["role"] == "admin";
+    final bool isAdmin = request.jsonData['role'] == 'admin';
 
     return Scaffold(
-      appBar: AppBar(title: const Text('News List')),
+      appBar: AppBar(
+        title: const Text('News List'),
+      ),
 
-      // ✅ tambah news
+      // ✅ FAB cuma admin
       floatingActionButton: isAdmin
           ? FloatingActionButton(
               backgroundColor: Colors.black,
@@ -70,81 +62,78 @@ class _NewsEntryListPageState extends State<NewsEntryListPage> {
                     builder: (_) => const NewsFormPage(),
                   ),
                 );
-                refreshList(request);
+                setState(() {});
               },
             )
           : null,
 
-      body: FutureBuilder(
-        future: _newsFuture,
-        builder: (context, AsyncSnapshot<List<News>> snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
+      body: FutureBuilder<List<News>>(
+        future: fetchNews(request),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
             return const Center(child: CircularProgressIndicator());
           }
 
-          if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          if (snapshot.data!.isEmpty) {
             return const Center(
-              child: Text('Tidak ada news.'),
+              child: Text('Tidak ada news ditemukan.'),
             );
           }
 
-          final newsList = snapshot.data!;
-
           return ListView.builder(
-            itemCount: newsList.length,
-            itemBuilder: (context, index) {
-              final news = newsList[index];
+            itemCount: snapshot.data!.length,
+            itemBuilder: (_, index) {
+              final news = snapshot.data![index];
 
               return NewsCard(
                 news: news,
+
+                // ✅ Tap = see details (AMAN, BALIK LAGI)
                 onTap: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) =>
-                          NewsDetailPage(news: news),
+                      builder: (_) => NewsDetailPage(news: news),
                     ),
                   );
                 },
 
-                // ✅ ADMIN ONLY
+                // ✅ Admin only
                 onEdit: isAdmin
                     ? () async {
                         await Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) =>
-                                NewsFormPage(news: news),
+                            builder: (_) => NewsFormPage(
+                              news: news, // <- edit mode
+                            ),
                           ),
                         );
-                        refreshList(request);
+                        setState(() {});
                       }
                     : null,
 
                 onDelete: isAdmin
                     ? () async {
-                        final confirm =
-                            await showDialog<bool>(
+                        final confirm = await showDialog<bool>(
                           context: context,
-                          builder: (_) => AlertDialog(
-                            title:
-                                const Text("Hapus berita?"),
+                          builder: (ctx) => AlertDialog(
+                            title: const Text('Hapus News'),
                             content: const Text(
-                                "Aksi ini tidak bisa dibatalkan."),
+                                'Yakin mau menghapus news ini?'),
                             actions: [
                               TextButton(
+                                child: const Text('Batal'),
                                 onPressed: () =>
-                                    Navigator.pop(
-                                        context, false),
-                                child:
-                                    const Text("Batal"),
+                                    Navigator.pop(ctx, false),
                               ),
-                              ElevatedButton(
+                              TextButton(
+                                child: const Text(
+                                  'Hapus',
+                                  style: TextStyle(color: Colors.red),
+                                ),
                                 onPressed: () =>
-                                    Navigator.pop(
-                                        context, true),
-                                child:
-                                    const Text("Hapus"),
+                                    Navigator.pop(ctx, true),
                               ),
                             ],
                           ),
@@ -152,8 +141,7 @@ class _NewsEntryListPageState extends State<NewsEntryListPage> {
 
                         if (confirm == true) {
                           await deleteNews(
-                              request, news.id);
-                          refreshList(request);
+                              request, news.id.toString());
                         }
                       }
                     : null,

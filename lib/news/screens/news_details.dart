@@ -20,11 +20,9 @@ class NewsDetailPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text('News Detail'),
-        backgroundColor: Colors.black,    
-        backgroundColor: Colors.black,    
+        backgroundColor: Colors.black,     
         foregroundColor: Colors.white,
       ),
 
