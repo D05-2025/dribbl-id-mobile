@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:dribbl_id/main/widget/navbar.dart';
 import 'package:dribbl_id/main/screens/home_page.dart';
 import 'package:dribbl_id/news/screens/news_list.dart';
+import 'package:dribbl_id/main/screens/others_page.dart';
+import 'package:dribbl_id/matches/screens/match_schedule.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -21,15 +23,13 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Define a variable to hold the current page widget
     Widget bodyContent;
 
     if (_currentIndex == 0) {
       bodyContent = const HomePage();
     } else if (_currentIndex == 1) {
-      bodyContent = const Center(
-        child: Text("Match Page", style: TextStyle(color: Colors.white)),
-      );
+      // Ubah bagian ini untuk menggunakan halaman baru
+      bodyContent = const MatchSchedulePage();
     } else if (_currentIndex == 2) {
       bodyContent = const NewsEntryListPage();
     } else if (_currentIndex == 3) {
@@ -37,13 +37,11 @@ class _MainPageState extends State<MainPage> {
         child: Text("Events Page", style: TextStyle(color: Colors.white)),
       );
     } else {
-      bodyContent = const Center(
-        child: Text("Others Page", style: TextStyle(color: Colors.white)),
-      );
+      bodyContent = const OthersPage();
     }
 
     return Scaffold(
-      backgroundColor: Colors.black, // Ensure the main scaffold is dark
+      backgroundColor: Colors.black,
       body: bodyContent,
       bottomNavigationBar: BottomNavBar(
         currentIndex: _currentIndex,

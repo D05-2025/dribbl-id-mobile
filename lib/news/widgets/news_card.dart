@@ -4,7 +4,6 @@ import 'package:dribbl_id/news/models/news.dart';
 class NewsCard extends StatelessWidget {
   final News news;
   final VoidCallback onTap;
-  final bool isAdmin;
   final VoidCallback? onEdit;
   final VoidCallback? onDelete;
 
@@ -12,7 +11,6 @@ class NewsCard extends StatelessWidget {
     super.key,
     required this.news,
     required this.onTap,
-    this.isAdmin = false,
     this.onEdit,
     this.onDelete,
   });
@@ -41,7 +39,7 @@ class NewsCard extends StatelessWidget {
                     height: 150,
                     width: double.infinity,
                     fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => Container(
+                    errorBuilder: (_, __, ___) => Container(
                       height: 150,
                       color: Colors.grey[300],
                       child: const Center(child: Icon(Icons.broken_image)),
@@ -57,17 +55,15 @@ class NewsCard extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-
                 const SizedBox(height: 6),
 
                 Text(
                   'Category: ${news.category}',
                   style: const TextStyle(
                     fontSize: 14,
-                    color: Colors.white,
+                    color: Colors.greenAccent,
                   ),
                 ),
-
                 const SizedBox(height: 6),
 
                 Text(
@@ -76,9 +72,8 @@ class NewsCard extends StatelessWidget {
                       : news.content,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(color: Colors.white),
+                  style: const TextStyle(color: Colors.black87),
                 ),
-
                 const SizedBox(height: 6),
 
                 Text(
@@ -89,23 +84,24 @@ class NewsCard extends StatelessWidget {
                   ),
                 ),
 
-                const SizedBox(height: 12),
-
-                // 🔥 TOMBOL ADMIN
-                if (isAdmin)
+                if (onEdit != null || onDelete != null) ...[
+                  const SizedBox(height: 10),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      IconButton(
-                        icon: const Icon(Icons.edit, color: Colors.blue),
-                        onPressed: onEdit,
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.delete, color: Colors.red),
-                        onPressed: onDelete,
-                      ),
+                      if (onEdit != null)
+                        IconButton(
+                          icon: const Icon(Icons.edit, color: Colors.blue),
+                          onPressed: onEdit,
+                        ),
+                      if (onDelete != null)
+                        IconButton(
+                          icon: const Icon(Icons.delete, color: Colors.red),
+                          onPressed: onDelete,
+                        ),
                     ],
                   ),
+                ],
               ],
             ),
           ),

@@ -1,7 +1,3 @@
-// To parse this JSON data, do
-//
-//     final match = matchFromJson(jsonString);
-
 import 'dart:convert';
 
 List<Match> matchFromJson(String str) =>
@@ -14,6 +10,11 @@ class Match {
   String uuid;
   String homeTeam;
   String awayTeam;
+  // Field baru untuk gambar
+  String? homeTeamLogo; 
+  String? awayTeamLogo;
+  String? matchThumbnail; 
+  
   DateTime tipoffAt;
   String venue;
   String status;
@@ -24,6 +25,9 @@ class Match {
     required this.uuid,
     required this.homeTeam,
     required this.awayTeam,
+    this.homeTeamLogo,
+    this.awayTeamLogo,
+    this.matchThumbnail,
     required this.tipoffAt,
     required this.venue,
     required this.status,
@@ -35,6 +39,11 @@ class Match {
     uuid: json["uuid"],
     homeTeam: json["home_team"],
     awayTeam: json["away_team"],
+    // Ambil data logo/thumbnail jika ada di JSON, jika tidak null
+    homeTeamLogo: json["home_team_logo"], 
+    awayTeamLogo: json["away_team_logo"],
+    matchThumbnail: json["match_thumbnail"],
+    
     tipoffAt: DateTime.parse(json["tipoff_at"]),
     venue: json["venue"],
     status: json["status"],
@@ -46,6 +55,9 @@ class Match {
     "uuid": uuid,
     "home_team": homeTeam,
     "away_team": awayTeam,
+    "home_team_logo": homeTeamLogo,
+    "away_team_logo": awayTeamLogo,
+    "match_thumbnail": matchThumbnail,
     "tipoff_at": tipoffAt.toIso8601String(),
     "venue": venue,
     "status": status,

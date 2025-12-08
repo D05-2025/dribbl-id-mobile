@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
+
 import 'package:dribbl_id/news/models/news.dart';
 import 'package:dribbl_id/news/widgets/news_card.dart';
 import 'package:dribbl_id/news/screens/news_details.dart';
@@ -14,70 +15,149 @@ class NewsEntryListPage extends StatefulWidget {
 }
 
 class _NewsEntryListPageState extends State<NewsEntryListPage> {
-  Future<List<News>> fetchNews(CookieRequest request) async {
+  late Future<List<News>> _newsFuture;
 
-    final response = await request.get('http://localhost:8000/news/json/');
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final request = context.read<CookieRequest>();
+    _newsFuture = fetchNews(request);
+  }
+
+  // ✅ FETCH
+  Future<List<News>> fetchNews(CookieRequest request) async {
+    final response =
+        await request.get('http://localhost:8000/news/json/');
+
     List<News> listNews = [];
     for (var d in response) {
-      if (d != null) {
-        listNews.add(News.fromJson(d));
-      }
+      listNews.add(News.fromJson(d));
     }
     return listNews;
+  }
+
+  // ✅ DELETE
+  Future<void> deleteNews(
+      CookieRequest request, String id) async {
+    await request.post(
+      'http://localhost:8000/news/delete-news-ajax/$id/',
+      {},
+    );
+  }
+
+  void refreshList(CookieRequest request) {
+    setState(() {
+      _newsFuture = fetchNews(request);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
-    
+    final isAdmin = request.jsonData["role"] == "admin";
+
     return Scaffold(
       appBar: AppBar(title: const Text('News List')),
-      floatingActionButton: 
-        request.jsonData["role"] == 'admin' 
-            ? FloatingActionButton(
-                backgroundColor: Colors.black,
-                onPressed: () {
-                Navigator.push(
+
+      // ✅ tambah news
+      floatingActionButton: isAdmin
+          ? FloatingActionButton(
+              backgroundColor: Colors.black,
+              child: const Icon(Icons.add, color: Colors.white),
+              onPressed: () async {
+                await Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const NewsFormPage(),
+                    builder: (_) => const NewsFormPage(),
                   ),
                 );
+                refreshList(request);
               },
+            )
+          : null,
 
-                child: const Icon(Icons.add, color: Colors.white),
-              )
-            : null,
       body: FutureBuilder(
-        future: fetchNews(request),
+        future: _newsFuture,
         builder: (context, AsyncSnapshot<List<News>> snapshot) {
-          if (!snapshot.hasData) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
 
-          if (snapshot.data!.isEmpty) {
+          if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return const Center(
-              child: Text(
-                'Tidak ada news ditemukan.',
-                style: TextStyle(fontSize: 18),
-              ),
+              child: Text('Tidak ada news.'),
             );
           }
 
+          final newsList = snapshot.data!;
+
           return ListView.builder(
-            itemCount: snapshot.data!.length,
-            itemBuilder: (_, index) {
-              final item = snapshot.data![index];
+            itemCount: newsList.length,
+            itemBuilder: (context, index) {
+              final news = newsList[index];
+
               return NewsCard(
-                news: item,
+                news: news,
                 onTap: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => NewsDetailPage(news: item),
+                      builder: (_) =>
+                          NewsDetailPage(news: news),
                     ),
                   );
                 },
+
+                // ✅ ADMIN ONLY
+                onEdit: isAdmin
+                    ? () async {
+                        await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) =>
+                                NewsFormPage(news: news),
+                          ),
+                        );
+                        refreshList(request);
+                      }
+                    : null,
+
+                onDelete: isAdmin
+                    ? () async {
+                        final confirm =
+                            await showDialog<bool>(
+                          context: context,
+                          builder: (_) => AlertDialog(
+                            title:
+                                const Text("Hapus berita?"),
+                            content: const Text(
+                                "Aksi ini tidak bisa dibatalkan."),
+                            actions: [
+                              TextButton(
+                                onPressed: () =>
+                                    Navigator.pop(
+                                        context, false),
+                                child:
+                                    const Text("Batal"),
+                              ),
+                              ElevatedButton(
+                                onPressed: () =>
+                                    Navigator.pop(
+                                        context, true),
+                                child:
+                                    const Text("Hapus"),
+                              ),
+                            ],
+                          ),
+                        );
+
+                        if (confirm == true) {
+                          await deleteNews(
+                              request, news.id);
+                          refreshList(request);
+                        }
+                      }
+                    : null,
               );
             },
           );

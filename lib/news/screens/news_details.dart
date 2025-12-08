@@ -59,7 +59,7 @@ class NewsDetailPage extends StatelessWidget {
                     style: const TextStyle(
                       fontSize: 26,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: Colors.black,
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -104,7 +104,7 @@ class NewsDetailPage extends StatelessWidget {
                     style: const TextStyle(
                       fontSize: 16,
                       height: 1.6,
-                      color: Colors.white,
+                      color: Colors.black,
                     ),
                     textAlign: TextAlign.justify,
                   ),
