@@ -4,6 +4,7 @@ import 'package:dribbl_id/news/models/news.dart';
 class NewsCard extends StatelessWidget {
   final News news;
   final VoidCallback onTap;
+  final bool isAdmin;
   final VoidCallback? onEdit;
   final VoidCallback? onDelete;
 
@@ -11,6 +12,7 @@ class NewsCard extends StatelessWidget {
     super.key,
     required this.news,
     required this.onTap,
+    this.isAdmin = false,
     this.onEdit,
     this.onDelete,
   });
@@ -55,15 +57,17 @@ class NewsCard extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
+
                 const SizedBox(height: 6),
 
                 Text(
                   'Category: ${news.category}',
                   style: const TextStyle(
                     fontSize: 14,
-                    color: Colors.greenAccent,
+                    color: Colors.white,
                   ),
                 ),
+
                 const SizedBox(height: 6),
 
                 Text(
@@ -72,8 +76,9 @@ class NewsCard extends StatelessWidget {
                       : news.content,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(color: Colors.black87),
+                  style: const TextStyle(color: Colors.white),
                 ),
+
                 const SizedBox(height: 6),
 
                 Text(
@@ -84,24 +89,22 @@ class NewsCard extends StatelessWidget {
                   ),
                 ),
 
-                if (onEdit != null || onDelete != null) ...[
-                  const SizedBox(height: 10),
+                const SizedBox(height: 12),
+
+                if (isAdmin)
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      if (onEdit != null)
-                        IconButton(
-                          icon: const Icon(Icons.edit, color: Colors.blue),
-                          onPressed: onEdit,
-                        ),
-                      if (onDelete != null)
-                        IconButton(
-                          icon: const Icon(Icons.delete, color: Colors.red),
-                          onPressed: onDelete,
-                        ),
+                      IconButton(
+                        icon: const Icon(Icons.edit, color: Colors.blue),
+                        onPressed: onEdit,
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.delete, color: Colors.red),
+                        onPressed: onDelete,
+                      ),
                     ],
                   ),
-                ],
               ],
             ),
           ),

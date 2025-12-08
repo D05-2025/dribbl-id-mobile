@@ -20,8 +20,10 @@ class NewsDetailPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text('News Detail'),
+        backgroundColor: Colors.black,    
         backgroundColor: Colors.black,    
         foregroundColor: Colors.white,
       ),
@@ -59,7 +61,7 @@ class NewsDetailPage extends StatelessWidget {
                     style: const TextStyle(
                       fontSize: 26,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black,
+                      color: Colors.white,
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -104,7 +106,7 @@ class NewsDetailPage extends StatelessWidget {
                     style: const TextStyle(
                       fontSize: 16,
                       height: 1.6,
-                      color: Colors.black,
+                      color: Colors.white,
                     ),
                     textAlign: TextAlign.justify,
                   ),

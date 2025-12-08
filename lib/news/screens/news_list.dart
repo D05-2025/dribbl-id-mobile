@@ -29,6 +29,7 @@ class _NewsEntryListPageState extends State<NewsEntryListPage> {
     final response =
         await request.get('http://localhost:8000/news/json/');
 
+    final response = await request.get('http://localhost:8000/news/json/');
     List<News> listNews = [];
     for (var d in response) {
       listNews.add(News.fromJson(d));

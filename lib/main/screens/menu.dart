@@ -4,6 +4,7 @@ import 'package:dribbl_id/main/screens/home_page.dart';
 import 'package:dribbl_id/news/screens/news_list.dart';
 import 'package:dribbl_id/main/screens/others_page.dart';
 import 'package:dribbl_id/matches/screens/match_schedule.dart';
+import 'package:dribbl_id/news/screens/news_list.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
