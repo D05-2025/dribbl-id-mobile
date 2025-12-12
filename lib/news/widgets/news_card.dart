@@ -4,11 +4,17 @@ import 'package:dribbl_id/news/models/news.dart';
 class NewsCard extends StatelessWidget {
   final News news;
   final VoidCallback onTap;
+  final bool isAdmin;
+  final VoidCallback? onEdit;
+  final VoidCallback? onDelete;
 
   const NewsCard({
     super.key,
     required this.news,
     required this.onTap,
+    this.isAdmin = false,
+    this.onEdit,
+    this.onDelete,
   });
 
   @override
@@ -28,7 +34,6 @@ class NewsCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Thumbnail
                 ClipRRect(
                   borderRadius: BorderRadius.circular(6),
                   child: Image.network(
@@ -45,7 +50,6 @@ class NewsCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
 
-                // Title
                 Text(
                   news.title,
                   style: const TextStyle(
@@ -53,37 +57,54 @@ class NewsCard extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
+
                 const SizedBox(height: 6),
 
-                // Category
                 Text(
                   'Category: ${news.category}',
                   style: const TextStyle(
                     fontSize: 14,
-                    color: Colors.black54,
+                    color: Colors.white,
                   ),
                 ),
+
                 const SizedBox(height: 6),
 
-                // Content preview
                 Text(
                   news.content.length > 100
                       ? '${news.content.substring(0, 100)}...'
                       : news.content,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(color: Colors.black87),
+                  style: const TextStyle(color: Colors.white),
                 ),
+
                 const SizedBox(height: 6),
 
-                // Created date
                 Text(
                   'Posted: ${news.createdAt.toLocal().toString().substring(0, 16)}',
                   style: TextStyle(
                     color: Colors.grey.shade600,
                     fontSize: 12,
                   ),
-                )
+                ),
+
+                const SizedBox(height: 12),
+
+                if (isAdmin)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.edit, color: Colors.blue),
+                        onPressed: onEdit,
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.delete, color: Colors.red),
+                        onPressed: onDelete,
+                      ),
+                    ],
+                  ),
               ],
             ),
           ),
