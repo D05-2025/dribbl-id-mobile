@@ -1,7 +1,4 @@
-// To parse this JSON data, do
-//
-//     final team = teamFromJson(jsonString);
-
+// File: lib/teams/models/team.dart
 import 'dart:convert';
 
 List<Team> teamFromJson(String str) =>
@@ -28,7 +25,8 @@ class Team {
   factory Team.fromJson(Map<String, dynamic> json) => Team(
     name: json["name"],
     logo: json["logo"],
-    region: json["region"],
+    // Handle jika region null atau tidak ada di JSON
+    region: json["region"] ?? "Unknown", 
     founded: DateTime.parse(json["founded"]),
     description: json["description"],
   );

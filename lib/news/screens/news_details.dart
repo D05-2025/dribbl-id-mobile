@@ -19,10 +19,10 @@ class NewsDetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white, // base putih
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text('News Detail'),
-        backgroundColor: Colors.black,       // hitam clean
+        backgroundColor: Colors.black,     
         foregroundColor: Colors.white,
       ),
 
@@ -54,18 +54,16 @@ class NewsDetailPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
 
-                  // Title
                   Text(
                     news.title,
                     style: const TextStyle(
                       fontSize: 26,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black,
+                      color: Colors.white,
                     ),
                   ),
                   const SizedBox(height: 12),
 
-                  // Category + Date
                   Row(
                     children: [
                       Container(
@@ -101,13 +99,12 @@ class NewsDetailPage extends StatelessWidget {
                   const SizedBox(height: 12),
                   const Divider(),
 
-                  // Full content
                   Text(
                     news.content,
                     style: const TextStyle(
                       fontSize: 16,
                       height: 1.6,
-                      color: Colors.black87,
+                      color: Colors.white,
                     ),
                     textAlign: TextAlign.justify,
                   ),
