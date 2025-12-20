@@ -32,7 +32,9 @@ class _EventCardState extends State<EventCard> {
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final cardWidth = screenWidth > 900 ? 900.0 : screenWidth * 0.95;
+
+    // 1. MODIFIKASI UKURAN: Buat lebih kecil untuk mobile (misal 0.88 dari layar)
+    final cardWidth = screenWidth > 900 ? 900.0 : (screenWidth < 600 ? screenWidth * 0.88 : screenWidth * 0.95);
     final isMobile = screenWidth < 600;
 
     return MouseRegion(
@@ -46,24 +48,25 @@ class _EventCardState extends State<EventCard> {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeOutCubic,
+        // 2. MODIFIKASI ALIGNMENT: Tambahkan ini agar zoom simetris di tengah
+        alignment: Alignment.center,
+        transformAlignment: Alignment.center,
         transform: Matrix4.identity()
-          ..scale(isHovered && !isMobile ? 1.012 : 1.0),
+          ..scale(isHovered ? 1.02 : 1.0), // Sedikit diperbesar efeknya agar terasa di mobile
         margin: EdgeInsets.symmetric(
-          vertical: isMobile ? 12 : 18,
-          horizontal: isMobile ? 12 : 0,
+          vertical: isMobile ? 10 : 18, // Margin vertical sedikit dikurangi untuk mobile
+          horizontal: isMobile ? 12 : 18,
         ),
         child: GestureDetector(
           onTap: widget.onTap,
           child: Center(
             child: Container(
-              width: isMobile ? double.infinity : cardWidth,
+              // Menggunakan cardWidth yang sudah dikalkulasi
+              width: cardWidth,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(isMobile ? 16 : 22),
                 gradient: const LinearGradient(
-                  colors: [
-                    Color(0xFF141414),
-                    Color(0xFF0F0F0F),
-                  ],
+                  colors: [Color(0xFF141414), Color(0xFF0F0F0F)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -76,13 +79,14 @@ class _EventCardState extends State<EventCard> {
                 ],
                 border: Border.all(color: Colors.grey.shade800),
               ),
-
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(isMobile ? 16 : 22),
                 child: Stack(
                   children: [
                     isMobile ? _buildMobileLayout() : _buildDesktopLayout(),
-                    if (!isMobile) _buildShineAnimation(cardWidth),
+
+                    _buildShineAnimation(cardWidth),
+
                     _buildActionButtons(isMobile),
                   ],
                 ),
@@ -114,14 +118,9 @@ class _EventCardState extends State<EventCard> {
               width: 260,
               height: 200,
               fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) => _buildImagePlaceholder(200, width: 260),
             )
-                : Container(
-              width: 260,
-              height: 200,
-              color: Colors.grey.shade800,
-              child: const Icon(Icons.image,
-                  color: Colors.white30, size: 40),
-            ),
+                : _buildImagePlaceholder(200, width: 260),
           ),
         ),
       ],
@@ -138,13 +137,14 @@ class _EventCardState extends State<EventCard> {
             widget.event.imageUrl,
             height: 180,
             fit: BoxFit.cover,
+            // Ini tetap perlu ada sebagai jaring pengaman
+            errorBuilder: (context, error, stackTrace) {
+              print("Error load gambar: $error"); // Agar kamu bisa cek di konsol
+              return _buildImagePlaceholder(180);
+            },
           )
         else
-          Container(
-            height: 180,
-            color: Colors.grey.shade800,
-            child: const Icon(Icons.image, color: Colors.white30, size: 40),
-          ),
+          _buildImagePlaceholder(180),
         Padding(
           padding: const EdgeInsets.all(16),
           child: _buildContent(isMobile: true),
@@ -176,8 +176,6 @@ class _EventCardState extends State<EventCard> {
           ),
         ),
         SizedBox(height: isMobile ? 8 : 10),
-
-        // description tidak null (model kamu tidak nullable)
         if (widget.event.description.isNotEmpty)
           Text(
             widget.event.description,
@@ -189,7 +187,6 @@ class _EventCardState extends State<EventCard> {
               height: 1.4,
             ),
           ),
-
         SizedBox(height: isMobile ? 10 : 14),
         _info(Icons.location_on_outlined, widget.event.location),
         const SizedBox(height: 8),
@@ -221,27 +218,32 @@ class _EventCardState extends State<EventCard> {
     );
   }
 
+  // Shine Animation (Desktop)
   Widget _buildShineAnimation(double cardWidth) {
+    // Cek apakah mobile untuk menyesuaikan lebar cahaya
+    final isSmall = cardWidth < 500;
+
     return AnimatedPositioned(
       duration: const Duration(milliseconds: 1200),
       curve: Curves.easeOutExpo,
-      left: isHovered ? cardWidth * 0.95 : -260,
+      // Cahaya bergerak dari kiri ke kanan saat isHovered true
+      left: isHovered ? cardWidth * 1.2 : - (isSmall ? 150.0 : 260.0),
       top: -20,
       child: AnimatedOpacity(
-        duration: const Duration(milliseconds: 4000),
+        duration: const Duration(milliseconds: 800),
         opacity: isHovered ? 0.45 : 0.0,
         child: Transform.rotate(
           angle: -0.35,
           child: Container(
-            width: 150,
-            height: 300,
+            width: isSmall ? 80 : 150, // Lebih ramping di mobile
+            height: 400,
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
                   Colors.white.withOpacity(0.0),
-                  Colors.white.withOpacity(0.20),
+                  Colors.white.withOpacity(0.20), // Kilauan cahaya
                   Colors.white.withOpacity(0.04),
                   Colors.white.withOpacity(0.0),
                 ],
@@ -253,6 +255,7 @@ class _EventCardState extends State<EventCard> {
     );
   }
 
+  // Action Buttons (for both Mobile and Desktop)
   Widget _buildActionButtons(bool isMobile) {
     return Positioned(
       top: isMobile ? 12 : 18,
@@ -262,7 +265,7 @@ class _EventCardState extends State<EventCard> {
         onExit: (_) => setState(() => hoverActions = false),
         child: AnimatedOpacity(
           duration: const Duration(milliseconds: 220),
-          opacity: isMobile ? 1 : (isHovered || hoverActions ? 1 : 0),
+          opacity: (isHovered || hoverActions) ? 1 : 0,
           child: Row(
             children: [
               if (widget.onEdit != null)
@@ -284,78 +287,11 @@ class _EventCardState extends State<EventCard> {
     );
   }
 
-  Widget _info(IconData icon, String text) {
-    return Row(
-      children: [
-        Icon(icon, size: 18, color: Colors.grey.shade400),
-        const SizedBox(width: 8),
-        Text(
-          text,
-          style: TextStyle(
-            color: Colors.grey.shade300,
-            fontSize: 16,
-          ),
-        ),
-      ],
-    );
-  }
-
-  // Menyesuaikan badge "Public" agar lebih seragam
-  Widget _buildBadge() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: widget.event.isPublic
-            ? Colors.greenAccent.shade700
-            : Colors.orange.shade700,
-        borderRadius: BorderRadius.circular(8), // border radius dikurangi
-      ),
-      child: Text(
-        widget.event.isPublic ? "Public" : "Private",
-        style: const TextStyle(
-          color: Colors.white,
-          fontSize: 13,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-    );
-  }
-
-  // Menyesuaikan badge "Tanggal" agar lebih seragam
-  Widget _buildDateBadge() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: Colors.blueGrey.shade700,
-        borderRadius: BorderRadius.circular(8), // border radius dikurangi
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            Icons.calendar_today,
-            size: 14,
-            color: Colors.white.withOpacity(0.9),
-          ),
-          const SizedBox(width: 6),
-          Text(
-            formattedDate,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _appleActionBtn(
-      IconData icon, {
-        Color color = Colors.white,
-        required VoidCallback onTap,
-      }) {
+  // Button for Action
+  Widget _appleActionBtn(IconData icon, {
+    Color color = Colors.white,
+    required VoidCallback onTap,
+  }) {
     return GestureDetector(
       onTap: onTap,
       child: ClipRRect(
@@ -389,4 +325,88 @@ class _EventCardState extends State<EventCard> {
       ),
     );
   }
+
+  // Info Widget (Location & Time)
+  Widget _info(IconData icon, String text) {
+    return Row(
+      children: [
+        Icon(icon, size: 18, color: Colors.grey.shade400),
+        const SizedBox(width: 8),
+        Text(
+          text,
+          style: TextStyle(
+            color: Colors.grey.shade300,
+            fontSize: 16,
+          ),
+        ),
+      ],
+    );
+  }
+
+  // Badge (Public/Private)
+  Widget _buildBadge() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: widget.event.isPublic
+            ? Colors.greenAccent.shade700
+            : Colors.orange.shade700,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Text(
+        widget.event.isPublic ? "Public" : "Private",
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 13,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
+  }
+
+  // Date Badge
+  Widget _buildDateBadge() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: Colors.blueGrey.shade700,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.calendar_today,
+            size: 14,
+            color: Colors.white.withOpacity(0.9),
+          ),
+          const SizedBox(width: 6),
+          Text(
+            formattedDate,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+Widget _buildImagePlaceholder(double height, {double? width}) {
+  return Container(
+    width: width ?? double.infinity,
+    height: height,
+    color: Colors.grey.shade800,
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(Icons.broken_image_outlined, color: Colors.white30, size: 40),
+        const SizedBox(height: 8),
+        Text("Gagal memuat gambar", style: TextStyle(color: Colors.white30, fontSize: 12)),
+      ],
+    ),
+  );
 }

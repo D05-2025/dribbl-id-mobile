@@ -126,7 +126,7 @@ class _EventListPageState extends State<EventListPage> {
 
     // ====== cek lebar layar, kalau kecil pakai mode ikon ======
     final screenWidth = MediaQuery.of(context).size.width;
-    final bool isCompact = screenWidth < 430; // 👈 dinaikkan, 400px sudah ikon-only
+    final bool isCompact = screenWidth < 430;
 
     // daftar item dropdown filter (dipakai di 2 mode: normal & compact)
     final filterItems = [
@@ -216,14 +216,14 @@ class _EventListPageState extends State<EventListPage> {
                       style: _topBarTextStyle,
                       textAlignVertical: TextAlignVertical.center,
                       decoration: InputDecoration(
-                        isDense: true, // biar lebih rapat dan ketengah
+                        isDense: true,
                         hintText: "Cari event atau lokasi...",
                         hintStyle: _topBarTextStyle.copyWith(
                           color: Colors.white,
                         ),
                         prefixIcon: const Icon(
                           Icons.search,
-                          color: Colors.white, // samain juga ikon search-nya
+                          color: Colors.white,
                         ),
                         prefixIconConstraints: const BoxConstraints(
                           minWidth: 32,
@@ -231,7 +231,7 @@ class _EventListPageState extends State<EventListPage> {
                         ),
                         border: InputBorder.none,
                         contentPadding: const EdgeInsets.symmetric(
-                          vertical: 12, // Penyesuaian vertical
+                          vertical: 12,
                         ),
                       ),
                       onChanged: (value) {
@@ -252,47 +252,43 @@ class _EventListPageState extends State<EventListPage> {
                       Expanded(
                         child: Container(
                           height: 40,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 1),
                           decoration: BoxDecoration(
                             color: Colors.grey[850],
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: DropdownButtonHideUnderline(
                             child: isCompact
-                            // ===== mode compact: cuma ikon filter =====
-                                ? DropdownButton<String>(
-                              value: _filterOption,
-                              dropdownColor: Colors.grey[900],
-                              icon: const Icon(
-                                Icons.filter_list,
-                                color: Colors.white,
+                                ? Center( // Tambahkan Center di sini
+                              child: DropdownButton<String>(
+                                value: _filterOption,
+                                dropdownColor: Colors.grey[900],
+                                // Gunakan icon yang dipusatkan
+                                icon: const Icon(
+                                  Icons.filter_list,
+                                  color: Colors.white,
+                                  size: 20,
+                                ),
+                                // Menghilangkan arrow default agar hanya ikon filter yang terlihat di tengah
+                                iconSize: 20,
+                                underline: const SizedBox(),
+                                // selectedItemBuilder sangat penting agar teks "Semua Event"
+                                // tidak muncul dan menggeser ikon ke samping
+                                selectedItemBuilder: (context) => filterItems.map((_) => const SizedBox.shrink()).toList(),
+                                items: filterItems,
+                                onChanged: (value) {
+                                  if (value != null) {
+                                    setState(() => _filterOption = value);
+                                  }
+                                },
                               ),
-                              style: _topBarTextStyle,
-                              items: filterItems,
-                              // hide selected text, cuma ikon yang kelihatan
-                              selectedItemBuilder: (context) =>
-                                  filterItems
-                                      .map((_) =>
-                                  const SizedBox.shrink())
-                                      .toList(),
-                              onChanged: (value) {
-                                if (value != null) {
-                                  setState(() => _filterOption = value);
-                                }
-                              },
                             )
-                            // ===== mode normal: teks + arrow =====
                                 : DropdownButton<String>(
                               isDense: true,
-                              isExpanded:
-                              true, // 👈 biar muat di lebar kontainer
+                              isExpanded: true,
+                              padding: const EdgeInsets.symmetric(horizontal: 12),
                               value: _filterOption,
                               dropdownColor: Colors.grey[900],
-                              icon: const Icon(
-                                Icons.arrow_drop_down,
-                                color: Colors.white,
-                              ),
+                              icon: const Icon(Icons.arrow_drop_down, color: Colors.white),
                               style: _topBarTextStyle,
                               items: filterItems,
                               onChanged: (value) {
@@ -323,7 +319,7 @@ class _EventListPageState extends State<EventListPage> {
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: isCompact
-                            // ===== mode compact: cuma ikon panah =====
+                            // Compact mode: Only sort arrow
                                 ? Center(
                               child: Icon(
                                 _sortAsc
@@ -333,12 +329,12 @@ class _EventListPageState extends State<EventListPage> {
                                 size: 18,
                               ),
                             )
-                            // ===== mode normal: teks + ikon =====
+                            // Normal mode: Text + arrow
                                 : Row(
                               mainAxisAlignment:
                               MainAxisAlignment.spaceBetween,
                               children: [
-                                Expanded( // 👈 kasih flex biar gak overflow
+                                Expanded(
                                   child: Text(
                                     _sortAsc
                                         ? "Terdekat dulu"
