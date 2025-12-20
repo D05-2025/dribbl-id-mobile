@@ -37,7 +37,7 @@ class Event {
     description: json["description"],
     date: DateTime.parse(json["date"]),
     time: json["time"],
-    imageUrl: json["image_url"],
+    imageUrl: json["image_url"] ?? "",
     isPublic: json["is_public"],
     location: json["location"],
   );

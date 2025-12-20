@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:dribbl_id/main/widget/navbar.dart';
 import 'package:dribbl_id/main/screens/home_page.dart';
+import 'package:dribbl_id/events/screens/event_list.dart';
+import 'package:dribbl_id/news/screens/news_list.dart';
 import 'package:dribbl_id/main/screens/others_page.dart';
 import 'package:dribbl_id/matches/screens/match_schedule.dart';
 
@@ -30,13 +32,12 @@ class _MainPageState extends State<MainPage> {
       // Ubah bagian ini untuk menggunakan halaman baru
       bodyContent = const MatchSchedulePage();
     } else if (_currentIndex == 2) {
-      bodyContent = const Center(
-        child: Text("News Page", style: TextStyle(color: Colors.white)),
-      );
+      bodyContent = const NewsEntryListPage();
     } else if (_currentIndex == 3) {
-      bodyContent = const Center(
-        child: Text("Events Page", style: TextStyle(color: Colors.white)),
-      );
+      // bodyContent = const Center(
+      //   child: Text("Events Page", style: TextStyle(color: Colors.white)),
+      // );
+      bodyContent = const EventListPage();
     } else {
       bodyContent = const OthersPage();
     }
