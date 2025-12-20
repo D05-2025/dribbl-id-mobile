@@ -17,7 +17,6 @@ class NewsCard extends StatelessWidget {
     this.onDelete,
   });
 
-  // Helper untuk warna kategori agar estetik
   Color _getCategoryColor(String category) {
     switch (category.toLowerCase()) {
       case 'nba': return Colors.blue;
@@ -30,28 +29,25 @@ class NewsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      // Margin luar agar card tidak menempel ke pinggir layar
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E1E1E), // Background gelap sesuai gambar
+        color: const Color(0xFF1E1E1E), 
         borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min, // Agar tinggi card menyesuaikan isi
+        mainAxisSize: MainAxisSize.min, 
         children: [
-          // 1. Gambar dengan Label Kategori di atasnya (Stack)
-          Stack(
+              Stack(
             children: [
               ClipRRect(
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
                 child: Image.network(
                   news.thumbnail,
-                  height: 180,
+                  height: 100,
                   width: double.infinity,
                   fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) => 
-                    Container(height: 180, color: Colors.grey[800], child: const Icon(Icons.broken_image, color: Colors.white)),
+                  errorBuilder: (context, error, stackTrace) => Container(height: 100, color: Colors.grey),
                 ),
               ),
               Positioned(
@@ -72,17 +68,15 @@ class NewsCard extends StatelessWidget {
             ],
           ),
 
-          // 2. Konten Teks
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Judul dan Tombol Admin
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Expanded( // Mencegah judul overflow ke samping
+                    Expanded( 
                       child: Text(
                         news.title,
                         style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
@@ -112,17 +106,15 @@ class NewsCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
 
-                // Isi Konten (PENYEBAB OVERFLOW UTAMA)
                 Text(
                   news.content,
-                  maxLines: 2, // Membatasi hanya 2 baris agar tidak overflow ke bawah
-                  overflow: TextOverflow.ellipsis, // Memberikan efek "..." jika teks kepotong
+                  maxLines: 2, 
+                  overflow: TextOverflow.ellipsis, 
                   style: const TextStyle(color: Colors.grey, fontSize: 14),
                 ),
                 
                 const SizedBox(height: 16),
 
-                // 3. Footer: Tanggal & Button
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [

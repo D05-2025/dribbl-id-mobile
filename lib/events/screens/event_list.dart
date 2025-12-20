@@ -114,7 +114,7 @@ class _EventListPageState extends State<EventListPage> {
   }
 
   Future<List<Event>> fetchEvents(CookieRequest request) async {
-    final response = await request.get("https://pbp.cs.ui.ac.id/febrian.abimanyu/events/json/");
+    final response = await request.get("https://febrian-abimanyu-dribbl-id.pbp.cs.ui.ac.id/events/json/");
     return response.map<Event>((e) => Event.fromJson(e)).toList();
   }
 

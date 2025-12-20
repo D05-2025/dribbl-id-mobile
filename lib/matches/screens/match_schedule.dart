@@ -17,7 +17,7 @@ class _MatchSchedulePageState extends State<MatchSchedulePage> {
 
   Future<List<Match>> fetchMatches(CookieRequest request) async {
     // Sesuaikan URL
-    final response = await request.get('https://pbp.cs.ui.ac.id/febrian.abimanyu/dribbl-id/matches/json/'); 
+    final response = await request.get('https://febrian-abimanyu-dribbl-id.pbp.cs.ui.ac.id/matches/json/'); 
     List<Match> listMatch = [];
     for (var d in response) {
       if (d != null) {

@@ -18,7 +18,6 @@ class _NewsEntryListPageState extends State<NewsEntryListPage> {
   String _selectedCategory = 'All';
   String _selectedSort = 'Terbaru';
 
-  // Daftar kategori disesuaikan dengan CATEGORY_CHOICES di models.py
   final List<Map<String, String>> _categories = [
     {'value': 'All', 'label': 'All Categories'},
     {'value': 'nba', 'label': 'NBA'},
@@ -40,7 +39,6 @@ class _NewsEntryListPageState extends State<NewsEntryListPage> {
           .toList();
     }
 
-    // Logika Sorting
     if (_selectedSort == 'Terbaru') {
       listNews.sort((a, b) => b.createdAt.compareTo(a.createdAt));
     } else if (_selectedSort == 'Terlama') {
@@ -58,9 +56,8 @@ class _NewsEntryListPageState extends State<NewsEntryListPage> {
 
   Future<void> deleteNews(
       CookieRequest request, String id, BuildContext context) async {
-    // Menggunakan path delete-news-ajax sesuai urls.py Django
     final response = await request
-        .post('http://localhost:8000/news/delete-news-ajax/$id/', {});
+        .post('http://febrian-abimanyu-dribbl-id.pbp.cs.ui.ac.id/news/delete-news-ajax/$id/', {});
     
     if (response['status'] == 'success') {
       if (context.mounted) {
@@ -84,7 +81,7 @@ class _NewsEntryListPageState extends State<NewsEntryListPage> {
     final isAdmin = request.jsonData['role'] == 'admin';
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0D0D0D), // Tema Gelap
+      backgroundColor: const Color(0xFF0D0D0D), 
       appBar: AppBar(
         title: const Text(
           'Basketball News',
@@ -108,7 +105,6 @@ class _NewsEntryListPageState extends State<NewsEntryListPage> {
           : null,
       body: Column(
         children: [
-          // Filter Section: Menggunakan Expanded untuk mencegah Overflow
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             child: Row(
@@ -165,7 +161,6 @@ class _NewsEntryListPageState extends State<NewsEntryListPage> {
             ),
           ),
 
-          // News List Section
           Expanded(
             child: FutureBuilder(
               future: fetchNews(request),
