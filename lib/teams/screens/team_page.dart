@@ -30,7 +30,7 @@ class _TeamsPageState extends State<TeamsPage> {
   Future<List<Team>> fetchTeams(CookieRequest request) async {
     // Sesuaikan endpoint dengan URL Django kamu
     // Gunakan http://10.0.2.2:8000/teams/json/ jika menggunakan Android Emulator
-    final response = await request.get('https://pbp.cs.ui.ac.id/febrian.abimanyu/dribbl-id/teams/json/');
+    final response = await request.get('https://febrian-abimanyu-dribbl-id.pbp.cs.ui.ac.id/teams/json/');
     List<Team> listTeams = [];
     for (var d in response) {
       if (d != null) {
