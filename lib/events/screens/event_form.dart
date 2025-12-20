@@ -217,7 +217,7 @@ class _EventFormPageState extends State<EventFormPage> {
                         // === UPDATE MODE ===
                         if (widget.event != null) {
                           response = await request.postJson(
-                            "http://localhost:8000/events/update-flutter/",
+                            "http://localhost:8000/events/edit-flutter/",
                             jsonEncode({
                               "id": widget.event!.id,
                               ...body,
