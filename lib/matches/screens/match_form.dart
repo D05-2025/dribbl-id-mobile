@@ -18,7 +18,7 @@ class _MatchFormPageState extends State<MatchFormPage> {
   String _awayTeam = "";
   String _matchThumbnail = "";
   String _venue = "";
-
+  
   String _status = "Scheduled"; 
   
   DateTime _selectedDate = DateTime.now();
