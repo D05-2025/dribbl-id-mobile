@@ -17,43 +17,41 @@ class NewsCard extends StatelessWidget {
     this.onDelete,
   });
 
+  // Helper untuk warna kategori agar estetik
   Color _getCategoryColor(String category) {
     switch (category.toLowerCase()) {
       case 'nba': return Colors.blue;
       case 'ibl': return Colors.green;
       case 'fiba': return Colors.redAccent;
-      case 'transfer': return Colors.purple;
-      case 'highlight': return Colors.teal;
       default: return Colors.orange;
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final DateTime now = DateTime.now();
-    final String formattedDate = "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
-
     return Container(
-      margin: const EdgeInsets.only(bottom: 20, left: 16, right: 16),
+      // Margin luar agar card tidak menempel ke pinggir layar
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E1E1E), 
+        color: const Color(0xFF1E1E1E), // Background gelap sesuai gambar
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min, // Agar tinggi card menyesuaikan isi
         children: [
+          // 1. Gambar dengan Label Kategori di atasnya (Stack)
           Stack(
             children: [
               ClipRRect(
                 borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
                 child: Image.network(
                   news.thumbnail,
-                  height: 200,
+                  height: 180,
                   width: double.infinity,
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) => 
-                    Container(height: 200, color: Colors.grey, child: const Icon(Icons.image_not_supported, color: Colors.white)),
+                    Container(height: 180, color: Colors.grey[800], child: const Icon(Icons.broken_image, color: Colors.white)),
                 ),
               ),
               Positioned(
@@ -67,26 +65,28 @@ class NewsCard extends StatelessWidget {
                   ),
                   child: Text(
                     news.category.toUpperCase(),
-                    style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
+                    style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
                   ),
                 ),
               ),
             ],
           ),
-          
+
+          // 2. Konten Teks
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Judul dan Tombol Admin
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Expanded(
+                    Expanded( // Mencegah judul overflow ke samping
                       child: Text(
                         news.title,
                         style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
-                        maxLines: 2,
+                        maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
@@ -94,11 +94,16 @@ class NewsCard extends StatelessWidget {
                       Row(
                         children: [
                           IconButton(
-                            icon: const Icon(Icons.edit, size: 20, color: Colors.blue),
+                            constraints: const BoxConstraints(), // Mengecilkan area klik agar hemat tempat
+                            padding: EdgeInsets.zero,
+                            icon: const Icon(Icons.edit, color: Colors.blue, size: 20),
                             onPressed: onEdit,
                           ),
+                          const SizedBox(width: 10),
                           IconButton(
-                            icon: const Icon(Icons.delete, size: 20, color: Colors.redAccent),
+                            constraints: const BoxConstraints(),
+                            padding: EdgeInsets.zero,
+                            icon: const Icon(Icons.delete, color: Colors.redAccent, size: 20),
                             onPressed: onDelete,
                           ),
                         ],
@@ -106,23 +111,27 @@ class NewsCard extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 8),
+
+                // Isi Konten (PENYEBAB OVERFLOW UTAMA)
                 Text(
                   news.content,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
+                  maxLines: 2, // Membatasi hanya 2 baris agar tidak overflow ke bawah
+                  overflow: TextOverflow.ellipsis, // Memberikan efek "..." jika teks kepotong
                   style: const TextStyle(color: Colors.grey, fontSize: 14),
                 ),
-                const SizedBox(height: 20),
                 
+                const SizedBox(height: 16),
+
+                // 3. Footer: Tanggal & Button
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Row(
                       children: [
                         const Icon(Icons.calendar_today, size: 14, color: Colors.grey),
-                        const SizedBox(width: 6),
+                        const SizedBox(width: 5),
                         Text(
-                          formattedDate, 
+                          "${news.createdAt.year}-${news.createdAt.month.toString().padLeft(2, '0')}-${news.createdAt.day.toString().padLeft(2, '0')}",
                           style: const TextStyle(color: Colors.grey, fontSize: 12),
                         ),
                       ],
@@ -130,13 +139,13 @@ class NewsCard extends StatelessWidget {
                     ElevatedButton(
                       onPressed: onTap,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white12,
+                        backgroundColor: const Color(0xFF333333),
                         foregroundColor: Colors.white,
                         elevation: 0,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       ),
-                      child: const Text("See Details", style: TextStyle(fontWeight: FontWeight.bold)),
+                      child: const Text("See Details", style: TextStyle(fontSize: 12)),
                     ),
                   ],
                 ),
