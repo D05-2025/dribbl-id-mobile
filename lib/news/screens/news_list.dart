@@ -29,7 +29,7 @@ class _NewsEntryListPageState extends State<NewsEntryListPage> {
   ];
 
   Future<List<News>> fetchNews(CookieRequest request) async {
-    final response = await request.get('https://febrian-abimanyu-dribbl-id.pbp.cs.ui.ac.id/news/json/');
+    final response = await request.get('http:localhost:8000/news/json/');
     List<News> listNews = response.map<News>((d) => News.fromJson(d)).toList();
 
     if (_selectedCategory != 'All') {
