@@ -217,7 +217,7 @@ class _EventFormPageState extends State<EventFormPage> {
                         // === UPDATE MODE ===
                         if (widget.event != null) {
                           response = await request.postJson(
-                            "http://localhost:8000/events/update-flutter/",
+                            "https://pbp.cs.ui.ac.id/febrian.abimanyu/dribbl-id/events/update-flutter/",
                             jsonEncode({
                               "id": widget.event!.id,
                               ...body,
@@ -227,7 +227,7 @@ class _EventFormPageState extends State<EventFormPage> {
                           // === CREATE MODE ===
                         } else {
                           response = await request.postJson(
-                            "http://localhost:8000/events/create-flutter/",
+                            "https://pbp.cs.ui.ac.id/febrian.abimanyu/dribbl-id/events/create-flutter/",
                             jsonEncode(body),
                           );
                         }
