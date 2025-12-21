@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
-import 'package:dribbl_id/players/screens/player_list.dart';
 
 class PlayerFormPage extends StatefulWidget {
   const PlayerFormPage({super.key});
@@ -173,12 +172,7 @@ class _PlayerFormPageState extends State<PlayerFormPage> {
                                   content: Text("Player saved successfully!"),
                                 ),
                               );
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const PlayerListPage(),
-                                ),
-                              );
+                              Navigator.pop(context);
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
