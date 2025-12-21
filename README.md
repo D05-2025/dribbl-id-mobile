@@ -33,3 +33,6 @@ LINK BLOG:
 - Vidya Pramudita Andini (2406432513): https://medium.com/@vidyapramudita07/beyond-basic-crud-membangun-modul-event-dengan-akses-berdasarkan-peran-di-aplikasi-dribbl-id-7531d740fc5b
 - Rayna Balqis (2406400373): https://medium.com/@raynabalq.s/dari-scroll-panjang-jadi-pelajaran-nambahin-filter-di-flutter-54f9f3f34aa0
 - Febrian Abimanyu Wijanarko (2406397984): https://febrianabimanyu.blogspot.com/2025/12/mengapa-pengembangan-aplikasi-mobile.html
+
+LINK VIDEO:
+https://drive.google.com/file/d/1uFgma6L5NkxtACUDg5lharTnZCzXK2je/view?usp=drivesdk
