@@ -26,11 +26,7 @@ class _PlayerFormPageState extends State<PlayerFormPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Center(
-          child: Text(
-            'Form Tambah Player',
-          ),
-        ),
+        title: const Center(child: Text('Form Tambah Player')),
         backgroundColor: Colors.black,
         foregroundColor: Colors.white,
       ),
@@ -152,12 +148,15 @@ class _PlayerFormPageState extends State<PlayerFormPage> {
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.orange[800],
-                        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 40,
+                          vertical: 16,
+                        ),
                       ),
                       onPressed: () async {
                         if (_formKey.currentState!.validate()) {
                           final response = await request.postJson(
-                            "http://127.0.0.1:8000/create-flutter/",
+                            "http://febrian-abimanyu-dribbl-id.pbp.cs.ui.ac.id/players/create-flutter/",
                             jsonEncode(<String, dynamic>{
                               'name': _name,
                               'team': _team,
@@ -169,24 +168,36 @@ class _PlayerFormPageState extends State<PlayerFormPage> {
                           );
                           if (context.mounted) {
                             if (response['status'] == 'success') {
-                              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                                content: Text("Player saved successfully!"),
-                              ));
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text("Player saved successfully!"),
+                                ),
+                              );
                               Navigator.pushReplacement(
                                 context,
-                                MaterialPageRoute(builder: (context) => const PlayerListPage()),
+                                MaterialPageRoute(
+                                  builder: (context) => const PlayerListPage(),
+                                ),
                               );
                             } else {
-                              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                                content: Text("Failed to save player. Please try again."),
-                              ));
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    "Failed to save player. Please try again.",
+                                  ),
+                                ),
+                              );
                             }
                           }
                         }
                       },
                       child: const Text(
                         "Save",
-                        style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ),
