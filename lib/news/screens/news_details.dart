@@ -46,7 +46,7 @@ class NewsDetailPage extends StatelessWidget {
               Stack(
                 children: [
                   Image.network(
-                    'https://febrian-abimanyu-dribbl-id.pbp.cs.ui.ac.id/news/proxy-image/?url=${Uri.encodeComponent(news.thumbnail)}',
+                    'https://febrian-abimanyu-dribbl-id.pbp.cs.ui.ac.id/proxy-image/?url=${Uri.encodeComponent(news.thumbnail)}',
                     width: double.infinity,
                     height: 250,
                     fit: BoxFit.cover,
