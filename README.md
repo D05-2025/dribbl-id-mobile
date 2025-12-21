@@ -28,3 +28,6 @@ ALUR PENGINTEGRASIAN DATA:
 Kami menggunakan API/JSON setiap fitur dari website yang sudah dibuat dan sudah ada di PWS, lalu kami akan mendapatkan informasi berupa data yang nantinya akan kami masukkan ke dalam aplikasi sehingga nantinya aplikasi dapat mengimplementasikan data dari json tersebut untuk membangun aplikasi berdasarkan website yang sudah kami buat.
 
 LINK DESIGN FIMA: https://www.figma.com/team_invite/redeem/4ttPY0nDk7TS9fiGuhwa5v
+
+LINK BLOG:
+- Vidya Pramudita Andini (2406432513): https://medium.com/@vidyapramudita07/beyond-basic-crud-membangun-modul-event-dengan-akses-berdasarkan-peran-di-aplikasi-dribbl-id-7531d740fc5b
