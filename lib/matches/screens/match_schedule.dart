@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:dribbl_id/matches/models/match.dart';
-import 'package:dribbl_id/matches/widgets/match_card.dart'; // Import card baru
+import 'package:dribbl_id/matches/widgets/match_card.dart';
+import 'package:dribbl_id/matches/screens/match_form.dart';
 
 class MatchSchedulePage extends StatefulWidget {
   const MatchSchedulePage({super.key});
@@ -12,12 +13,13 @@ class MatchSchedulePage extends StatefulWidget {
 }
 
 class _MatchSchedulePageState extends State<MatchSchedulePage> {
-  // Logic Sorting tetap ada sesuai permintaan
-  String _selectedTab = 'Live'; 
+  String _selectedTab = 'Live';
 
   Future<List<Match>> fetchMatches(CookieRequest request) async {
     // Sesuaikan URL
-    final response = await request.get('https://febrian-abimanyu-dribbl-id.pbp.cs.ui.ac.id/matches/json/'); 
+    final response = await request.get(
+      'https://febrian-abimanyu-dribbl-id.pbp.cs.ui.ac.id/matches/json/',
+    );
     List<Match> listMatch = [];
     for (var d in response) {
       if (d != null) {
@@ -27,14 +29,21 @@ class _MatchSchedulePageState extends State<MatchSchedulePage> {
     return listMatch;
   }
 
-  // Filter Logic
   List<Match> _filterMatches(List<Match> allMatches) {
     if (_selectedTab == 'Live') {
       return allMatches.where((m) => m.status.toLowerCase() == 'live').toList();
     } else if (_selectedTab == 'Scheduled') {
-      return allMatches.where((m) => m.status.toLowerCase() == 'upcoming' || m.status.toLowerCase() == 'scheduled').toList();
+      return allMatches
+          .where(
+            (m) =>
+                m.status.toLowerCase() == 'upcoming' ||
+                m.status.toLowerCase() == 'scheduled',
+          )
+          .toList();
     } else {
-      return allMatches.where((m) => m.status.toLowerCase() == 'finished').toList();
+      return allMatches
+          .where((m) => m.status.toLowerCase() == 'finished')
+          .toList();
     }
   }
 
@@ -44,11 +53,23 @@ class _MatchSchedulePageState extends State<MatchSchedulePage> {
 
     return Scaffold(
       backgroundColor: Colors.black,
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.cyanAccent,
+        tooltip: 'Add Match',
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const MatchFormPage()),
+          ).then((_) {
+            setState(() {});
+          });
+        },
+        child: const Icon(Icons.add, color: Colors.black),
+      ),
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header Glow
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Text(
@@ -68,7 +89,6 @@ class _MatchSchedulePageState extends State<MatchSchedulePage> {
               ),
             ),
 
-            // Tab Bar Sorting
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 16),
               padding: const EdgeInsets.all(4),
@@ -86,17 +106,30 @@ class _MatchSchedulePageState extends State<MatchSchedulePage> {
             ),
             const SizedBox(height: 16),
 
-            // List Matches dengan Card baru
             Expanded(
               child: FutureBuilder(
                 future: fetchMatches(request),
                 builder: (context, AsyncSnapshot<List<Match>> snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator(color: Colors.cyanAccent));
+                    return const Center(
+                      child: CircularProgressIndicator(
+                        color: Colors.cyanAccent,
+                      ),
+                    );
                   } else if (snapshot.hasError) {
-                    return Center(child: Text("Error: ${snapshot.error}", style: const TextStyle(color: Colors.white)));
+                    return Center(
+                      child: Text(
+                        "Error: ${snapshot.error}",
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                    );
                   } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return const Center(child: Text("No matches available", style: TextStyle(color: Colors.grey)));
+                    return const Center(
+                      child: Text(
+                        "No matches available",
+                        style: TextStyle(color: Colors.grey),
+                      ),
+                    );
                   } else {
                     final filteredMatches = _filterMatches(snapshot.data!);
 
@@ -112,7 +145,6 @@ class _MatchSchedulePageState extends State<MatchSchedulePage> {
                     return ListView.builder(
                       itemCount: filteredMatches.length,
                       itemBuilder: (_, index) {
-                        // Menggunakan widget MatchCard yang sudah diupdate
                         return MatchCard(match: filteredMatches[index]);
                       },
                     );
@@ -155,3 +187,5 @@ class _MatchSchedulePageState extends State<MatchSchedulePage> {
     );
   }
 }
+
+//tes

@@ -88,7 +88,7 @@ class NewsCard extends StatelessWidget {
                       Row(
                         children: [
                           IconButton(
-                            constraints: const BoxConstraints(), // Mengecilkan area klik agar hemat tempat
+                            constraints: const BoxConstraints(), 
                             padding: EdgeInsets.zero,
                             icon: const Icon(Icons.edit, color: Colors.blue, size: 20),
                             onPressed: onEdit,

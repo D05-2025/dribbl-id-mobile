@@ -3,6 +3,7 @@ import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:dribbl_id/main/screens/login.dart'; // Import the Login Page
 import 'package:dribbl_id/teams/screens/team_page.dart';
+import 'package:dribbl_id/players/screens/player_list.dart';
 
 class OthersPage extends StatelessWidget {
   const OthersPage({super.key});
@@ -63,7 +64,13 @@ class OthersPage extends StatelessWidget {
                 title: "Players",
                 subtitle: "Browse basketball player statistics",
                 onTap: () {
-                  // Navigate to Players page logic here
+                  // Navigate to Players Page
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const PlayerListPage(),
+                    ),
+                  );
                 },
               ),
 
@@ -80,9 +87,7 @@ class OthersPage extends StatelessWidget {
                   // Navigate to Teams Page
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                      builder: (context) => const TeamsPage(),
-                    ),
+                    MaterialPageRoute(builder: (context) => const TeamsPage()),
                   );
                 },
               ),

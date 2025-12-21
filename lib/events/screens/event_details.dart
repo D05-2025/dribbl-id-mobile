@@ -20,145 +20,92 @@ class EventDetailsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dateText = _formatDate(event.date);
-
-    final timeText = (event.time != null && event.time!.trim().isNotEmpty)
-        ? event.time!
-        : _formatTime(event.date);
-
-    final locationText = (event.location == null || event.location!.trim().isEmpty)
-        ? "Lokasi belum ditentukan"
-        : event.location!;
-
     return Scaffold(
+      backgroundColor: const Color(0xFF0F0F0F),
       appBar: AppBar(
-        title: Text(event.title),
-        centerTitle: true,
+        backgroundColor: Colors.transparent,
         elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: const Text("Detail Event", style: TextStyle(color: Colors.white)),
+        centerTitle: true,
       ),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          // Jika layar sangat lebar (Desktop), tetap gunakan side-by-side
+          if (constraints.maxWidth > 1100) {
+            return _buildDesktopLayout();
+          } else {
+            // Untuk iPad dan iPhone, gunakan layout vertikal yang sama
+            return _buildUnifiedMobileLayout(context);
+          }
+        },
+      ),
+    );
+  }
 
-      // ⬇⬇⬇ MIRIP BANGET dengan NewsDetailPage ⬇⬇⬇
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // ======= IMAGE (SAMA) =======
-            if (event.imageUrl != null && event.imageUrl!.isNotEmpty)
-              ClipRRect(
-                borderRadius: const BorderRadius.only(
-                  bottomLeft: Radius.circular(18),
-                  bottomRight: Radius.circular(18),
-                ),
-                child: Image.network(
-                  event.imageUrl!,
-                  width: double.infinity,
-                  height: 300,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) => Container(
-                    height: 250,
-                    color: Colors.grey.shade900,
-                    alignment: Alignment.center,
-                    child: const Icon(Icons.broken_image, size: 48, color: Colors.white30),
-                  ),
+  // ================= UNIFIED LAYOUT (IPHONE & IPAD) =================
+  Widget _buildUnifiedMobileLayout(BuildContext context) {
+    return Center(
+      child: SingleChildScrollView(
+        // ConstrainedBox ini yang menjaga agar di iPad kontennya tidak melar ke samping
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 600),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Kotak Foto (Sama seperti iPhone)
+              AspectRatio(
+                aspectRatio: 1,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(24),
+                  child: _buildEventImage(),
                 ),
               ),
+              const SizedBox(height: 32),
+              _buildMainHeader(),
+              const SizedBox(height: 32),
+              _buildSplitInfoGrid(),
+              const SizedBox(height: 48),
+              _buildActionButtons(),
+              const SizedBox(height: 40),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 
-            Padding(
-              padding: const EdgeInsets.all(18.0),
+  // ================= DESKTOP LAYOUT (Hanya untuk monitor besar) =================
+  Widget _buildDesktopLayout() {
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 1000),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Expanded(
+              flex: 5,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(28),
+                child: AspectRatio(aspectRatio: 1, child: _buildEventImage()),
+              ),
+            ),
+            const SizedBox(width: 60),
+            Expanded(
+              flex: 6,
               child: Column(
+                mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // ======= TITLE =======
-                  Text(
-                    event.title,
-                    style: const TextStyle(
-                      fontSize: 26,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-
-                  // ======= DATE & TIME CHIPS =======
-                  Row(
-                    children: [
-                      _InfoChip(
-                        icon: Icons.calendar_today_outlined,
-                        label: dateText,
-                      ),
-                      const SizedBox(width: 10),
-                      _InfoChip(
-                        icon: Icons.access_time,
-                        label: timeText,
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 12),
-
-                  // ======= LOCATION =======
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Icon(Icons.location_on_outlined, size: 20, color: Colors.redAccent),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          locationText,
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.grey.shade200,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 20),
-                  const Divider(),
-
-                  // ======= DESCRIPTION =======
-                  const Text(
-                    "Deskripsi",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-                  ),
-                  const SizedBox(height: 8),
-
-                  Text(
-                    (event.description == null || event.description!.trim().isEmpty)
-                        ? "Tidak ada deskripsi."
-                        : event.description!,
-                    style: const TextStyle(
-                      fontSize: 15,
-                      height: 1.5,
-                    ),
-                  ),
-
-                  const SizedBox(height: 22),
-
-                  // ======= ACTION BUTTONS =======
-                  Row(
-                    children: [
-                      ElevatedButton.icon(
-                        onPressed: () {},
-                        icon: const Icon(Icons.map_outlined),
-                        label: const Text("Buka di Peta"),
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      OutlinedButton.icon(
-                        onPressed: () {},
-                        icon: const Icon(Icons.share),
-                        label: const Text("Bagikan"),
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                        ),
-                      ),
-                    ],
-                  ),
+                  _buildMainHeader(),
+                  const SizedBox(height: 32),
+                  _buildSplitInfoGrid(),
+                  const SizedBox(height: 40),
+                  _buildActionButtons(),
                 ],
               ),
             ),
@@ -167,32 +114,104 @@ class EventDetailsPage extends StatelessWidget {
       ),
     );
   }
-}
 
-class _InfoChip extends StatelessWidget {
-  final IconData icon;
-  final String label;
+  // ================= REUSABLE COMPONENTS =================
 
-  const _InfoChip({required this.icon, required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
+  Widget _buildEventImage() {
+    return Image.network(
+      event.imageUrl ?? '',
+      fit: BoxFit.cover,
+      errorBuilder: (context, error, stackTrace) => Container(
         color: Colors.grey.shade900,
-        borderRadius: BorderRadius.circular(12),
+        child: const Icon(Icons.broken_image, color: Colors.white30, size: 48),
       ),
-      child: Row(
-        children: [
-          Icon(icon, size: 16, color: Colors.white70),
-          const SizedBox(width: 8),
-          Text(
-            label,
-            style: const TextStyle(color: Colors.white70, fontSize: 14),
+    );
+  }
+
+  Widget _buildMainHeader() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          event.title,
+          style: const TextStyle(
+            fontSize: 32,
+            fontWeight: FontWeight.w800,
+            color: Colors.white,
+            letterSpacing: -0.5,
           ),
-        ],
-      ),
+        ),
+        const SizedBox(height: 12),
+        Text(
+          event.description ?? "Saksikan pertandingan seru Fasilkom melawan FT",
+          style: TextStyle(color: Colors.grey.shade400, fontSize: 16, height: 1.5),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSplitInfoGrid() {
+    return Column(
+      children: [
+        _infoTile(Icons.calendar_today_rounded, "Tanggal", _formatDate(event.date), Colors.blueAccent),
+        const SizedBox(height: 16),
+        _infoTile(Icons.access_time_rounded, "Jam", event.time ?? _formatTime(event.date), Colors.orangeAccent),
+        const SizedBox(height: 16),
+        _infoTile(Icons.location_on_outlined, "Lokasi", event.location ?? "Lokasi belum ditentukan", Colors.redAccent),
+      ],
+    );
+  }
+
+  Widget _infoTile(IconData icon, String title, String content, Color color) {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(12)),
+          child: Icon(icon, color: color, size: 20),
+        ),
+        const SizedBox(width: 16),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(title, style: TextStyle(color: Colors.grey.shade500, fontSize: 12)),
+            Text(content, style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w600)),
+          ],
+        )
+      ],
+    );
+  }
+
+  Widget _buildActionButtons() {
+    return Row(
+      children: [
+        Expanded(
+          child: ElevatedButton(
+            onPressed: () {},
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blueAccent,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(vertical: 20),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            ),
+            child: const Text("Buka di Peta", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          ),
+        ),
+        const SizedBox(width: 16),
+        Container(
+          height: 60,
+          width: 60,
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.05),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.white10),
+          ),
+          child: IconButton(
+            icon: const Icon(Icons.share_outlined, color: Colors.white),
+            onPressed: () {},
+          ),
+        )
+      ],
     );
   }
 }
