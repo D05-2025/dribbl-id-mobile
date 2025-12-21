@@ -28,3 +28,7 @@ ALUR PENGINTEGRASIAN DATA:
 Kami menggunakan API/JSON setiap fitur dari website yang sudah dibuat dan sudah ada di PWS, lalu kami akan mendapatkan informasi berupa data yang nantinya akan kami masukkan ke dalam aplikasi sehingga nantinya aplikasi dapat mengimplementasikan data dari json tersebut untuk membangun aplikasi berdasarkan website yang sudah kami buat.
 
 LINK DESIGN FIMA: https://www.figma.com/team_invite/redeem/4ttPY0nDk7TS9fiGuhwa5v
+
+
+LINK BLOG :
+Febrian Abimanyu Wijanarko (2406397984) : https://febrianabimanyu.blogspot.com/2025/12/mengapa-pengembangan-aplikasi-mobile.html
