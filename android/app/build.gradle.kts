@@ -5,6 +5,8 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+import com.android.build.gradle.api.BaseVariantOutput
+
 android {
     namespace = "com.example.dribbl_id"
     compileSdk = flutter.compileSdkVersion
@@ -41,4 +43,17 @@ android {
 
 flutter {
     source = "../.."
+}
+
+// Rename APK outputs to a predictable filename: dribbl_id-<buildType>-<versionName>.apk
+android.applicationVariants.all { variant ->
+    variant.outputs.all { output ->
+        val appName = "Dribbl id"
+        val version = variant.versionName ?: "${project.version}"
+        val buildType = variant.buildType.name
+        val newName = "$appName-$buildType-$version.apk"
+        if (output is BaseVariantOutput) {
+            output.outputFileName = newName
+        }
+    }
 }
