@@ -5,7 +5,6 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
-import com.android.build.gradle.api.BaseVariantOutput
 
 android {
     namespace = "com.example.dribbl_id"
@@ -45,15 +44,29 @@ flutter {
     source = "../.."
 }
 
-// Rename APK outputs to a predictable filename: dribbl_id-<buildType>-<versionName>.apk
-android.applicationVariants.all { variant ->
-    variant.outputs.all { output ->
-        val appName = "Dribbl id"
-        val version = variant.versionName ?: "${project.version}"
-        val buildType = variant.buildType.name
-        val newName = "$appName-$buildType-$version.apk"
-        if (output is BaseVariantOutput) {
-            output.outputFileName = newName
+// Safe APK renamer: runs after assembleRelease and renames generated APK files
+tasks.register("renameApks") {
+    doLast {
+        val outDir = file("build/app/outputs/flutter-apk")
+        if (outDir.exists()) {
+            outDir.listFiles()?.filter { it.extension == "apk" }?.forEach { f ->
+                val versionName = android.defaultConfig.versionName ?: project.version.toString()
+                val buildType = "release"
+                val safeAppName = "dribbl_id"
+                val newName = "$safeAppName-$buildType-$versionName-${f.name}"
+                val dest = File(outDir, newName)
+                if (!f.renameTo(dest)) {
+                    logger.warn("Failed to rename ${f.name} -> $newName")
+                } else {
+                    logger.lifecycle("Renamed ${f.name} -> $newName")
+                }
+            }
         }
     }
+}
+
+// Some AGP/Flutter plugin task names may not be present at configuration time.
+// Use matching/configureEach so we don't fail if the task is added later.
+tasks.matching { it.name == "assembleRelease" }.configureEach {
+    finalizedBy("renameApks")
 }
