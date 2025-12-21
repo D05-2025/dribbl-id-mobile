@@ -9,206 +9,167 @@ class MatchCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Tentukan warna badge berdasarkan status
-    bool isLive = match.status.toLowerCase() == 'live';
-    bool isFinished = match.status.toLowerCase() == 'finished';
-    
-    Color badgeColor = isLive ? Colors.red : (isFinished ? Colors.green : Colors.grey);
-    String badgeText = isLive ? "LIVE" : match.status;
+    // Cek ketersediaan thumbnail
+    final bool hasThumbnail = match.matchThumbnail != null && match.matchThumbnail!.isNotEmpty;
 
     return GestureDetector(
       onTap: () {
-        // Navigasi ke halaman detail saat kartu ditekan
         Navigator.push(
           context,
-          MaterialPageRoute(
-            builder: (context) => MatchDetailPage(match: match),
-          ),
+          MaterialPageRoute(builder: (context) => MatchDetailPage(match: match)),
         );
       },
       child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        height: 200, // Tinggi kartu agar gambar terlihat jelas
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          // Gambar Thumbnail sebagai Background
-          image: DecorationImage(
-            image: NetworkImage(
-              match.matchThumbnail ?? "https://via.placeholder.com/400x200?text=No+Image",
-            ),
-            fit: BoxFit.cover,
-            onError: (exception, stackTrace) {
-              // Fallback jika error (bisa diganti asset lokal)
-            },
-          ),
+          color: const Color(0xFF1C1C1E), // Background Gelap
+          borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.5),
-              blurRadius: 8,
-              offset: const Offset(0, 4),
+              blurRadius: 6,
+              offset: const Offset(0, 3),
             ),
           ],
         ),
-        child: Container(
-          // Gradient Overlay supaya teks putih tetap terbaca di atas gambar
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                Colors.black.withOpacity(0.3), // Agak terang di atas
-                Colors.black.withOpacity(0.8), // Gelap di bawah untuk teks
-              ],
-            ),
-          ),
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              // --- Bagian Atas: Badge Status & Waktu ---
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        clipBehavior: Clip.antiAlias,
+        child: Column(
+          children: [
+            // --- 1. GAMBAR THUMBNAIL (Full Width) ---
+            SizedBox(
+              height: 180,
+              width: double.infinity,
+              child: Stack(
+                fit: StackFit.expand,
                 children: [
+                  // Gambar Match
+                  Image.network(
+                    hasThumbnail 
+                        ? match.matchThumbnail! 
+                        : "https://images.unsplash.com/photo-1546519638-68e109498ffc?q=80&w=1000", // Default Basket
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(color: Colors.grey[800]); // Placeholder jika error
+                    },
+                  ),
+                  
+                  // Gradient Hitam di Bawah Gambar (Agar teks Venue terbaca)
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
-                      color: badgeColor,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      badgeText.toUpperCase(),
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 12,
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [Colors.transparent, Colors.black.withOpacity(0.8)],
                       ),
                     ),
                   ),
-                  // Tanggal/Waktu kecil di pojok kanan atas
-                  Text(
-                    _formatShortDate(match.tipoffAt),
-                    style: const TextStyle(
-                      color: Colors.white70,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      shadows: [Shadow(color: Colors.black, blurRadius: 4)],
-                    ),
-                  ),
-                ],
-              ),
 
-              // --- Bagian Tengah/Bawah: Info Tim & Skor ---
-              Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      // Home Team
-                      Expanded(
-                        child: Column(
-                          children: [
-                            Text(
-                              match.homeTeam,
-                              textAlign: TextAlign.center,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                                shadows: [Shadow(color: Colors.black, blurRadius: 4)],
-                              ),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              "${match.homeScore}",
-                              style: const TextStyle(
-                                color: Colors.cyanAccent, // Warna skor menonjol
-                                fontWeight: FontWeight.w900,
-                                fontSize: 28,
-                                shadows: [Shadow(color: Colors.black, blurRadius: 10)],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      // VS Label
-                      const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 10),
-                        child: Text(
-                          "VS",
-                          style: TextStyle(
-                            color: Colors.white54,
-                            fontSize: 20,
-                            fontStyle: FontStyle.italic,
+                  // Info Venue & Tanggal di atas Gambar
+                  Positioned(
+                    bottom: 12,
+                    left: 12,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          match.venue,
+                          style: const TextStyle(
+                            color: Colors.white,
                             fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                            shadows: [Shadow(blurRadius: 4, color: Colors.black)],
                           ),
                         ),
-                      ),
-
-                      // Away Team
-                      Expanded(
-                        child: Column(
-                          children: [
-                            Text(
-                              match.awayTeam,
-                              textAlign: TextAlign.center,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                                shadows: [Shadow(color: Colors.black, blurRadius: 4)],
-                              ),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              "${match.awayScore}",
-                              style: const TextStyle(
-                                color: Colors.cyanAccent,
-                                fontWeight: FontWeight.w900,
-                                fontSize: 28,
-                                shadows: [Shadow(color: Colors.black, blurRadius: 10)],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  // Lokasi Kecil di Bawah
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.location_on, color: Colors.white70, size: 14),
-                      const SizedBox(width: 4),
-                      Flexible(
-                        child: Text(
-                          match.venue,
+                        Text(
+                          _formatDate(match.tipoffAt),
                           style: const TextStyle(color: Colors.white70, fontSize: 12),
-                          overflow: TextOverflow.ellipsis,
                         ),
-                      ),
-                    ],
-                  )
+                      ],
+                    ),
+                  ),
+
+                  // Badge Status (Live/Finished)
+                  Positioned(
+                    top: 12,
+                    right: 12,
+                    child: _buildStatusBadge(match.status),
+                  ),
                 ],
               ),
-            ],
-          ),
+            ),
+
+            // --- 2. INFORMASI SKOR & NAMA TIM ---
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // Home Team (Teks Kiri)
+                  Expanded(
+                    child: Text(
+                      match.homeTeam,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 15, // Ukuran font pas
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+
+                  // Skor (Tengah)
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: Colors.black45,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.white10),
+                    ),
+                    child: Text(
+                      "${match.homeScore} - ${match.awayScore}",
+                      style: const TextStyle(
+                        color: Colors.cyanAccent,
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+
+                  // Away Team (Teks Kanan)
+                  Expanded(
+                    child: Text(
+                      match.awayTeam,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 15,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  String _formatShortDate(DateTime date) {
-    // Ex: Oct 26, 19:30
-    final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    return '${months[date.month - 1]} ${date.day}, ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
+  Widget _buildStatusBadge(String status) {
+    Color color = status.toLowerCase() == 'live' ? Colors.red : (status.toLowerCase() == 'finished' ? Colors.green : Colors.grey);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(color: color.withOpacity(0.9), borderRadius: BorderRadius.circular(4)),
+      child: Text(status.toUpperCase(), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 10)),
+    );
+  }
+
+  String _formatDate(DateTime date) {
+    return "${date.day}/${date.month}/${date.year} • ${date.hour.toString().padLeft(2,'0')}:${date.minute.toString().padLeft(2,'0')}";
   }
 }
