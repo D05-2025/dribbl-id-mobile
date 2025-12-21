@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
-import 'package:dribbl_id/matches/screens/match_schedule.dart'; 
 
 class MatchFormPage extends StatefulWidget {
   const MatchFormPage({super.key});
@@ -18,9 +17,9 @@ class _MatchFormPageState extends State<MatchFormPage> {
   String _awayTeam = "";
   String _matchThumbnail = "";
   String _venue = "";
-  
-  String _status = "Scheduled"; 
-  
+
+  String _status = "Scheduled";
+
   DateTime _selectedDate = DateTime.now();
   TimeOfDay _selectedTime = TimeOfDay.now();
 
@@ -36,7 +35,10 @@ class _MatchFormPageState extends State<MatchFormPage> {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        title: const Text("Add New Match", style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text(
+          "Add New Match",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         backgroundColor: Colors.black,
         foregroundColor: Colors.white,
         elevation: 0,
@@ -86,7 +88,10 @@ class _MatchFormPageState extends State<MatchFormPage> {
                       readOnly: true,
                       style: const TextStyle(color: Colors.white),
                       decoration: _inputDecoration(hint: "Date").copyWith(
-                        suffixIcon: const Icon(Icons.calendar_today, color: Colors.cyanAccent),
+                        suffixIcon: const Icon(
+                          Icons.calendar_today,
+                          color: Colors.cyanAccent,
+                        ),
                       ),
                       onTap: () => _selectDate(context),
                       validator: (value) {
@@ -102,7 +107,10 @@ class _MatchFormPageState extends State<MatchFormPage> {
                       readOnly: true,
                       style: const TextStyle(color: Colors.white),
                       decoration: _inputDecoration(hint: "Time").copyWith(
-                        suffixIcon: const Icon(Icons.access_time, color: Colors.cyanAccent),
+                        suffixIcon: const Icon(
+                          Icons.access_time,
+                          color: Colors.cyanAccent,
+                        ),
                       ),
                       onTap: () => _selectTime(context),
                       validator: (value) {
@@ -128,7 +136,10 @@ class _MatchFormPageState extends State<MatchFormPage> {
                     value: _status,
                     dropdownColor: const Color(0xFF1C1C1E),
                     isExpanded: true,
-                    icon: const Icon(Icons.arrow_drop_down, color: Colors.cyanAccent),
+                    icon: const Icon(
+                      Icons.arrow_drop_down,
+                      color: Colors.cyanAccent,
+                    ),
                     style: const TextStyle(color: Colors.white),
                     items: _statusList.map((String value) {
                       return DropdownMenuItem<String>(
@@ -169,34 +180,37 @@ class _MatchFormPageState extends State<MatchFormPage> {
                       );
 
                       final response = await request.postJson(
-                        "http://localhost:8000/matches/create-flutter/", 
+                        "http://localhost:8000/matches/create-flutter/",
                         jsonEncode(<String, dynamic>{
                           'home_team': _homeTeam,
                           'away_team': _awayTeam,
                           'venue': _venue,
-                          'image_url': _matchThumbnail, 
+                          'image_url': _matchThumbnail,
                           'tipoff_at': tipoffDateTime.toIso8601String(),
                           'status': _status.toLowerCase(),
-                          'home_score': 0, 
+                          'home_score': 0,
                           'away_score': 0,
                         }),
                       );
 
                       if (context.mounted) {
                         if (response['status'] == 'success') {
-                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                            content: Text("Match saved successfully!"),
-                            backgroundColor: Colors.green,
-                          ));
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(builder: (context) => const MatchSchedulePage()),
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text("Match saved successfully!"),
+                              backgroundColor: Colors.green,
+                            ),
                           );
+                          Navigator.pop(context);
                         } else {
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                            content: Text("Failed: ${response['message'] ?? 'Unknown error'}"),
-                            backgroundColor: Colors.red,
-                          ));
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                "Failed: ${response['message'] ?? 'Unknown error'}",
+                              ),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
                         }
                       }
                     }
@@ -219,12 +233,19 @@ class _MatchFormPageState extends State<MatchFormPage> {
       padding: const EdgeInsets.only(bottom: 8.0),
       child: Text(
         title,
-        style: const TextStyle(color: Colors.cyanAccent, fontWeight: FontWeight.bold, fontSize: 16),
+        style: const TextStyle(
+          color: Colors.cyanAccent,
+          fontWeight: FontWeight.bold,
+          fontSize: 16,
+        ),
       ),
     );
   }
 
-  Widget _buildTextField({required String hint, required Function(String) onChanged}) {
+  Widget _buildTextField({
+    required String hint,
+    required Function(String) onChanged,
+  }) {
     return TextFormField(
       style: const TextStyle(color: Colors.white),
       decoration: _inputDecoration(hint: hint),
