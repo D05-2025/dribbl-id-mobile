@@ -14,9 +14,9 @@ class Player {
   String name;
   String position;
   String team;
-  int pointsPerGame;
-  int assistsPerGame;
-  int reboundsPerGame;
+  double pointsPerGame;
+  double assistsPerGame;
+  double reboundsPerGame;
 
   Player({
     required this.name,

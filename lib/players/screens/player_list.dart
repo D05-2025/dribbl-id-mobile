@@ -15,7 +15,7 @@ class PlayerListPage extends StatefulWidget {
 class _PlayerListPageState extends State<PlayerListPage> {
   Future<List<Player>> fetchPlayers(CookieRequest request) async {
     final response = await request.get(
-      'http://febrian-abimanyu-dribbl-id.pbp.cs.ui.ac.id/players/json/',
+      'https://febrian-abimanyu-dribbl-id.pbp.cs.ui.ac.id/players/json/',
     );
 
     var data = response;
@@ -167,41 +167,49 @@ class _PlayerListPageState extends State<PlayerListPage> {
                     ),
                   ),
                   Expanded(
-                    child: FutureBuilder(
+                    child: FutureBuilder<List<Player>>(
                       future: fetchPlayers(request),
-                      builder: (context, AsyncSnapshot snapshot) {
-                        if (snapshot.data == null) {
+                      builder: (context, AsyncSnapshot<List<Player>> snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
                           return const Center(
                             child: CircularProgressIndicator(),
                           );
-                        } else {
-                          if (!snapshot.hasData) {
-                            return const Center(
-                              // Center the no data text properly
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    "No player data available.",
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            );
-                          } else {
-                            return ListView.builder(
-                              itemCount: snapshot.data!.length,
-                              itemBuilder: (_, index) {
-                                return PlayerCard(
-                                  player: snapshot.data![index],
-                                );
-                              },
-                            );
-                          }
                         }
+
+                        if (snapshot.hasError) {
+                          return Center(
+                            child: Text(
+                              'Error loading players: ${snapshot.error}',
+                              style: const TextStyle(color: Colors.white),
+                            ),
+                          );
+                        }
+
+                        final players = snapshot.data;
+                        if (players == null || players.isEmpty) {
+                          return const Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  "No player data available.",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }
+
+                        return ListView.builder(
+                          itemCount: players.length,
+                          itemBuilder: (_, index) {
+                            return PlayerCard(player: players[index]);
+                          },
+                        );
                       },
                     ),
                   ),
