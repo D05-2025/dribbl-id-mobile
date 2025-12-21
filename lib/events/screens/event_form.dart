@@ -6,7 +6,7 @@ import 'package:pbp_django_auth/pbp_django_auth.dart';
 import '../models/event.dart';
 
 class EventFormPage extends StatefulWidget {
-  final Event? event;   // null → create, not null → edit
+  final Event? event; // null → create, not null → edit
 
   const EventFormPage({super.key, this.event});
 
@@ -76,7 +76,6 @@ class _EventFormPageState extends State<EventFormPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
 
             children: [
-
               // === Title ===
               Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -197,8 +196,7 @@ class _EventFormPageState extends State<EventFormPage> {
 
                   child: ElevatedButton(
                     style: ButtonStyle(
-                      backgroundColor:
-                      MaterialStateProperty.all(Colors.indigo),
+                      backgroundColor: MaterialStateProperty.all(Colors.indigo),
                     ),
                     onPressed: () async {
                       if (_formKey.currentState!.validate()) {
@@ -217,17 +215,14 @@ class _EventFormPageState extends State<EventFormPage> {
                         // === UPDATE MODE ===
                         if (widget.event != null) {
                           response = await request.postJson(
-                            "http://localhost:8000/events/edit-flutter/",
-                            jsonEncode({
-                              "id": widget.event!.id,
-                              ...body,
-                            }),
+                            "https://febrian-abimanyu-dribbl-id.pbp.cs.ui.ac.id/events/update-flutter/",
+                            jsonEncode({"id": widget.event!.id, ...body}),
                           );
 
                           // === CREATE MODE ===
                         } else {
                           response = await request.postJson(
-                            "http://localhost:8000/events/create-flutter/",
+                            "https://febrian-abimanyu-dribbl-id.pbp.cs.ui.ac.id/events/create-flutter/",
                             jsonEncode(body),
                           );
                         }
@@ -244,11 +239,15 @@ class _EventFormPageState extends State<EventFormPage> {
                               ),
                             ),
                           );
-                          Navigator.pop(context, true);  // ← kirim true ke halaman sebelumnya
+                          Navigator.pop(
+                            context,
+                            true,
+                          ); // ← kirim true ke halaman sebelumnya
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                                content: Text("Gagal menyimpan event.")),
+                              content: Text("Gagal menyimpan event."),
+                            ),
                           );
                         }
                       }
@@ -260,7 +259,6 @@ class _EventFormPageState extends State<EventFormPage> {
                   ),
                 ),
               ),
-
             ],
           ),
         ),

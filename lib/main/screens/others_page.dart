@@ -105,7 +105,7 @@ class OthersPage extends StatelessWidget {
                   // Logout Logic
                   final response = await request.logout(
                     // TODO: Change this URL to your actual Django app URL
-                    "http://localhost:8000/auth/logout/",
+                    "https://febrian-abimanyu-dribbl-id.pbp.cs.ui.ac.id/auth/logout/",
                   );
 
                   String message = response["message"];

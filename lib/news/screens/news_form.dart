@@ -78,8 +78,8 @@ class _NewsFormPageState extends State<NewsFormPage> {
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
                       final url = isEdit
-                          ? 'http://localhost:8000/news/edit-news-ajax/${widget.news!.id}/'
-                          : 'http://localhost:8000/news/create-flutter/';
+                          ? 'https://febrian-abimanyu-dribbl-id.pbp.cs.ui.ac.id/news/edit-news-ajax/${widget.news!.id}/'
+                          : 'https://febrian-abimanyu-dribbl-id.pbp.cs.ui.ac.id/news/create-flutter/';
 
                       final response = await request.postJson(
                         url,

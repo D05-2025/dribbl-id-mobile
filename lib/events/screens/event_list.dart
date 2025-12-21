@@ -53,7 +53,7 @@ class _EventListPageState extends State<EventListPage> {
 
     try {
       final response = await request.post(
-        "http://localhost:8000/events/delete-flutter/",
+        "https://febrian-abimanyu-dribbl-id.pbp.cs.ui.ac.id/events/delete-flutter/",
         {"id": id.toString()},
       );
 
@@ -114,7 +114,7 @@ class _EventListPageState extends State<EventListPage> {
   }
 
   Future<List<Event>> fetchEvents(CookieRequest request) async {
-    final response = await request.get("http://localhost:8000/events/json/");
+    final response = await request.get("https://febrian-abimanyu-dribbl-id.pbp.cs.ui.ac.id/events/json/");
     return response.map<Event>((e) => Event.fromJson(e)).toList();
   }
 

@@ -7,7 +7,7 @@ Anggota:
 4. Vidya Pramudita Andini (2406432513)
 5. Diaz Prayodhi Iskandar (2406432993)
 
-LINK APLIKASI : [LINK]
+LINK APLIKASI : [https://app.bitrise.io/app/3f3faf1d-ccb2-438c-89db-30262f831da6/installable-artifacts/5297ccac68aa987a/public-install-page/4fa974483ae3c160e5326e52dcd619e6]
 
 DRIBBL.ID
 Aplikasi ini adalah fansite yang dirancang khusus untuk penggemar basket di Indonesia. Platform ini menyajikan informasi terlengkap dan terkini seputar dunia basket dalam satu tempat yang mudah diakses, mulai dari berita terbaru, statistik pemain dan tim yang mendalam, jadwal dan skor pertandingan secara real-time, hingga informasi acara komunitas lokal seperti nonton bareng (nobar). Dengan tampilan yang modern dan mudah diakses, aplikasi ini bisa menjadi tempat berkumpulnya pecinta basket dari berbagai kalangan.

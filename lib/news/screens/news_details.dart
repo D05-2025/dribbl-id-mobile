@@ -7,17 +7,33 @@ class NewsDetailPage extends StatelessWidget {
   const NewsDetailPage({super.key, required this.news});
 
   String _formatDate(DateTime date) {
-    final months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    final months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
     return '${date.day} ${months[date.month - 1]} ${date.year}, ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0D0D0D), 
+      backgroundColor: const Color(0xFF0D0D0D),
       appBar: AppBar(
-        title: const Text('News Detail', style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.black,     
+        title: const Text(
+          'News Detail',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: Colors.black,
         foregroundColor: Colors.white,
         elevation: 0,
       ),
@@ -26,30 +42,33 @@ class NewsDetailPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 1. THUMBNAIL dengan gradasi gelap agar elegan
             if (news.thumbnail.isNotEmpty)
               Stack(
                 children: [
                   Image.network(
-                    // Gunakan URL Proxy jika masih bermasalah dengan CORS/301
-                    'https://febrian-abimanyu-dribbl-id.pbp.cs.ui.ac.id/news/proxy-image/?url=${Uri.encodeComponent(news.thumbnail)}', 
+                    'https://febrian-abimanyu-dribbl-id.pbp.cs.ui.ac.id/proxy-image/?url=${Uri.encodeComponent(news.thumbnail)}',
                     width: double.infinity,
-                    height: 280,
+                    height: 250,
                     fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => Container(
-                      height: 280,
+                    errorBuilder: (context, error, stackTrace) => Container(
+                      height: 250,
                       color: Colors.grey[900],
-                      child: const Center(child: Icon(Icons.broken_image, size: 48, color: Colors.white24)),
+                      child: const Icon(
+                        Icons.broken_image,
+                        color: Colors.white24,
+                      ),
                     ),
                   ),
-                  // Overlay gradasi hitam di bawah gambar
                   Positioned.fill(
                     child: Container(
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
-                          colors: [Colors.transparent, const Color(0xFF0D0D0D).withOpacity(0.8)],
+                          colors: [
+                            Colors.transparent,
+                            const Color(0xFF0D0D0D).withOpacity(0.8),
+                          ],
                         ),
                       ),
                     ),
@@ -58,7 +77,10 @@ class NewsDetailPage extends StatelessWidget {
               ),
 
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 20.0,
+                vertical: 16.0,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -67,7 +89,10 @@ class NewsDetailPage extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.amber, // Warna kontras untuk kategori
                           borderRadius: BorderRadius.circular(8),
@@ -75,7 +100,8 @@ class NewsDetailPage extends StatelessWidget {
                         child: Text(
                           news.category.toUpperCase(),
                           style: const TextStyle(
-                            color: Colors.black, // Tulisan hitam di atas background amber
+                            color: Colors
+                                .black, // Tulisan hitam di atas background amber
                             fontSize: 11,
                             fontWeight: FontWeight.bold,
                           ),
@@ -83,11 +109,14 @@ class NewsDetailPage extends StatelessWidget {
                       ),
                       Text(
                         _formatDate(news.createdAt),
-                        style: const TextStyle(fontSize: 12, color: Colors.grey),
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey,
+                        ),
                       ),
                     ],
                   ),
-                  
+
                   const SizedBox(height: 20),
 
                   // 3. JUDUL (Warna Putih agar terbaca di background hitam)
@@ -100,7 +129,7 @@ class NewsDetailPage extends StatelessWidget {
                       height: 1.2,
                     ),
                   ),
-                  
+
                   const SizedBox(height: 15),
                   const Divider(color: Colors.white10, thickness: 1),
                   const SizedBox(height: 15),
@@ -111,7 +140,8 @@ class NewsDetailPage extends StatelessWidget {
                     style: const TextStyle(
                       fontSize: 16,
                       height: 1.8,
-                      color: Colors.white70, // DIPERBAIKI: Menggunakan Putih lembut
+                      color: Colors
+                          .white70, // DIPERBAIKI: Menggunakan Putih lembut
                     ),
                     textAlign: TextAlign.justify,
                   ),

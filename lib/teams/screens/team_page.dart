@@ -16,7 +16,7 @@ class TeamsPage extends StatefulWidget {
 class _TeamsPageState extends State<TeamsPage> {
   String _searchQuery = "";
   String _selectedRegion = "All Regions";
-  
+
   late Future<List<Team>> _futureTeams;
 
   @override
@@ -27,8 +27,11 @@ class _TeamsPageState extends State<TeamsPage> {
   }
 
   Future<List<Team>> fetchTeams(CookieRequest request) async {
-    // Ganti URL sesuai endpoint kamu
-    final response = await request.get('http://localhost:8000/teams/json/');
+    // Sesuaikan endpoint dengan URL Django kamu
+    // Gunakan http://10.0.2.2:8000/teams/json/ jika menggunakan Android Emulator
+    final response = await request.get(
+      'https://febrian-abimanyu-dribbl-id.pbp.cs.ui.ac.id/teams/json/',
+    );
     List<Team> listTeams = [];
     for (var d in response) {
       if (d != null) {
@@ -43,7 +46,10 @@ class _TeamsPageState extends State<TeamsPage> {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        title: const Text("All Teams", style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text(
+          "All Teams",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         backgroundColor: Colors.black,
         foregroundColor: Colors.white,
         elevation: 0,
@@ -52,7 +58,10 @@ class _TeamsPageState extends State<TeamsPage> {
           Padding(
             padding: const EdgeInsets.only(right: 8.0),
             child: IconButton(
-              icon: const Icon(Icons.add_box_outlined, color: Colors.blueAccent),
+              icon: const Icon(
+                Icons.add_box_outlined,
+                color: Colors.blueAccent,
+              ),
               tooltip: "Add New Team",
               onPressed: () {
                 Navigator.push(
@@ -71,7 +80,7 @@ class _TeamsPageState extends State<TeamsPage> {
       ),
       // --- TOMBOL ADD (Floating Action Button) ---
       floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.blueAccent, 
+        backgroundColor: Colors.blueAccent,
         tooltip: 'Add Team',
         onPressed: () {
           Navigator.push(
@@ -94,9 +103,19 @@ class _TeamsPageState extends State<TeamsPage> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
-            return Center(child: Text("Error: ${snapshot.error}", style: const TextStyle(color: Colors.white)));
+            return Center(
+              child: Text(
+                "Error: ${snapshot.error}",
+                style: const TextStyle(color: Colors.white),
+              ),
+            );
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text("No teams found.", style: TextStyle(color: Colors.white)));
+            return const Center(
+              child: Text(
+                "No teams found.",
+                style: TextStyle(color: Colors.white),
+              ),
+            );
           }
 
           final allTeams = snapshot.data!;
@@ -104,8 +123,12 @@ class _TeamsPageState extends State<TeamsPage> {
           regions.addAll(allTeams.map((e) => e.region));
 
           final filteredTeams = allTeams.where((team) {
-            final matchesName = team.name.toLowerCase().contains(_searchQuery.toLowerCase());
-            final matchesRegion = _selectedRegion == "All Regions" || team.region == _selectedRegion;
+            final matchesName = team.name.toLowerCase().contains(
+              _searchQuery.toLowerCase(),
+            );
+            final matchesRegion =
+                _selectedRegion == "All Regions" ||
+                team.region == _selectedRegion;
             return matchesName && matchesRegion;
           }).toList();
 
@@ -129,7 +152,10 @@ class _TeamsPageState extends State<TeamsPage> {
                           borderRadius: BorderRadius.circular(8),
                           borderSide: BorderSide.none,
                         ),
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
                       ),
                       onChanged: (value) {
                         setState(() {
@@ -138,7 +164,7 @@ class _TeamsPageState extends State<TeamsPage> {
                       },
                     ),
                     const SizedBox(height: 12),
-                    
+
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12),
                       decoration: BoxDecoration(
@@ -147,17 +173,24 @@ class _TeamsPageState extends State<TeamsPage> {
                       ),
                       child: DropdownButtonHideUnderline(
                         child: DropdownButton<String>(
-                          value: regions.contains(_selectedRegion) ? _selectedRegion : "All Regions",
+                          value: regions.contains(_selectedRegion)
+                              ? _selectedRegion
+                              : "All Regions",
                           dropdownColor: const Color(0xFF1C1C1E),
                           isExpanded: true,
-                          icon: const Icon(Icons.keyboard_arrow_down, color: Colors.grey),
+                          icon: const Icon(
+                            Icons.keyboard_arrow_down,
+                            color: Colors.grey,
+                          ),
                           style: const TextStyle(color: Colors.white),
                           onChanged: (String? newValue) {
                             setState(() {
                               _selectedRegion = newValue!;
                             });
                           },
-                          items: regions.map<DropdownMenuItem<String>>((String value) {
+                          items: regions.map<DropdownMenuItem<String>>((
+                            String value,
+                          ) {
                             return DropdownMenuItem<String>(
                               value: value,
                               child: Text(value),
@@ -173,15 +206,21 @@ class _TeamsPageState extends State<TeamsPage> {
               // Grid Teams
               Expanded(
                 child: filteredTeams.isEmpty
-                    ? const Center(child: Text("No teams match your filter.", style: TextStyle(color: Colors.grey)))
+                    ? const Center(
+                        child: Text(
+                          "No teams match your filter.",
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                      )
                     : GridView.builder(
                         padding: const EdgeInsets.all(16),
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          childAspectRatio: 0.65,
-                          crossAxisSpacing: 16,
-                          mainAxisSpacing: 16,
-                        ),
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              childAspectRatio: 0.65,
+                              crossAxisSpacing: 16,
+                              mainAxisSpacing: 16,
+                            ),
                         itemCount: filteredTeams.length,
                         itemBuilder: (context, index) {
                           final team = filteredTeams[index];
@@ -191,7 +230,8 @@ class _TeamsPageState extends State<TeamsPage> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => TeamDetailPage(team: team),
+                                  builder: (context) =>
+                                      TeamDetailPage(team: team),
                                 ),
                               );
                             },

@@ -29,13 +29,17 @@ class _NewsEntryListPageState extends State<NewsEntryListPage> {
   ];
 
   Future<List<News>> fetchNews(CookieRequest request) async {
-    final response = await request.get('https://febrian-abimanyu-dribbl-id.pbp.cs.ui.ac.id/news/json/');
+    final response = await request.get(
+      'https://febrian-abimanyu-dribbl-id.pbp.cs.ui.ac.id/news/json/',
+    );
     List<News> listNews = response.map<News>((d) => News.fromJson(d)).toList();
 
     if (_selectedCategory != 'All') {
       listNews = listNews
-          .where((news) =>
-              news.category.toLowerCase() == _selectedCategory.toLowerCase())
+          .where(
+            (news) =>
+                news.category.toLowerCase() == _selectedCategory.toLowerCase(),
+          )
           .toList();
     }
 
@@ -44,21 +48,28 @@ class _NewsEntryListPageState extends State<NewsEntryListPage> {
     } else if (_selectedSort == 'Terlama') {
       listNews.sort((a, b) => a.createdAt.compareTo(b.createdAt));
     } else if (_selectedSort == 'Judul A-Z') {
-      listNews.sort((a, b) =>
-          a.title.toLowerCase().compareTo(b.title.toLowerCase()));
+      listNews.sort(
+        (a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()),
+      );
     } else if (_selectedSort == 'Judul Z-A') {
-      listNews.sort((a, b) =>
-          b.title.toLowerCase().compareTo(a.title.toLowerCase()));
+      listNews.sort(
+        (a, b) => b.title.toLowerCase().compareTo(a.title.toLowerCase()),
+      );
     }
 
     return listNews;
   }
 
   Future<void> deleteNews(
-      CookieRequest request, String id, BuildContext context) async {
-    final response = await request
-        .post('http:localhost:8000/news/delete-news-ajax/$id/', {});
-    
+    CookieRequest request,
+    String id,
+    BuildContext context,
+  ) async {
+    final response = await request.post(
+      'http://febrian-abimanyu-dribbl-id.pbp.cs.ui.ac.id/news/delete-news-ajax/$id/',
+      {},
+    );
+
     if (response['status'] == 'success') {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -68,9 +79,9 @@ class _NewsEntryListPageState extends State<NewsEntryListPage> {
       setState(() {});
     } else {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Failed to delete news")),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text("Failed to delete news")));
       }
     }
   }
@@ -81,7 +92,7 @@ class _NewsEntryListPageState extends State<NewsEntryListPage> {
     final isAdmin = request.jsonData['role'] == 'admin';
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0D0D0D), 
+      backgroundColor: const Color(0xFF0D0D0D),
       appBar: AppBar(
         title: const Text(
           'Basketball News',
@@ -106,7 +117,10 @@ class _NewsEntryListPageState extends State<NewsEntryListPage> {
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16.0,
+              vertical: 8.0,
+            ),
             child: Row(
               children: [
                 Expanded(

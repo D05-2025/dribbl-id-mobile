@@ -155,7 +155,7 @@ class _PlayerFormPageState extends State<PlayerFormPage> {
                       onPressed: () async {
                         if (_formKey.currentState!.validate()) {
                           final response = await request.postJson(
-                            "http://127.0.0.1:8000/players/create-flutter/",
+                            "http://febrian-abimanyu-dribbl-id.pbp.cs.ui.ac.id/players/create-flutter/",
                             jsonEncode(<String, dynamic>{
                               'name': _name,
                               'team': _team,

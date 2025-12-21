@@ -162,7 +162,7 @@ class _TeamFormPageState extends State<TeamFormPage> {
                       // Kirim data ke Django
                       // TODO: Pastikan endpoint URL ini benar sesuai `urls.py` di Django kamu
                       final response = await request.postJson(
-                        "http://localhost:8000/teams/create-flutter/", 
+                        "https://febrian-abimanyu-dribbl-id.pbp.cs.ui.ac.id/teams/create-flutter/", 
                         jsonEncode({
                           "name": _name,
                           "logo": _logo,

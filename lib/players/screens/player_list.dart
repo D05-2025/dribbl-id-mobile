@@ -14,10 +14,12 @@ class PlayerListPage extends StatefulWidget {
 
 class _PlayerListPageState extends State<PlayerListPage> {
   Future<List<Player>> fetchPlayers(CookieRequest request) async {
-    final response = await request.get('http://127.0.0.1:8000/players/json/');
-    
+    final response = await request.get(
+      'https://febrian-abimanyu-dribbl-id.pbp.cs.ui.ac.id/players/json/',
+    );
+
     var data = response;
-    
+
     List<Player> listPlayer = [];
     for (var d in data) {
       if (d != null) {
@@ -53,7 +55,9 @@ class _PlayerListPageState extends State<PlayerListPage> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF374151), // Dark button
                     foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(4),
+                    ),
                   ),
                 ),
               ],
@@ -62,66 +66,155 @@ class _PlayerListPageState extends State<PlayerListPage> {
           // Table Container
           Expanded(
             child: Container(
-             margin: const EdgeInsets.symmetric(horizontal: 16.0),
-             decoration: BoxDecoration(
-               color: const Color(0xFF1F2937), // Dark grey background for table
-               borderRadius: BorderRadius.circular(8.0),
-               border: Border.all(color: const Color(0xFF374151)),
-             ),
-             child: Column(
-               children: [
-                 // Table Header
-                 Container(
-                   padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-                   decoration: const BoxDecoration(
-                     color: Color(0xFF111827), // Darker header background
-                     borderRadius: BorderRadius.only(topLeft: Radius.circular(8.0), topRight: Radius.circular(8.0)),
-                     border: Border(bottom: BorderSide(color: Color(0xFF374151))),
-                   ),
-                   child: Row(
-                     children: [
-                       Expanded(flex: 3, child: Text("NAME", style: TextStyle(color: Colors.grey[400], fontWeight: FontWeight.bold, fontSize: 11))),
-                       Expanded(flex: 1, child: Text("TEAM", style: TextStyle(color: Colors.grey[400], fontWeight: FontWeight.bold, fontSize: 11))),
-                       Expanded(flex: 1, child: Text("POSITION", style: TextStyle(color: Colors.grey[400], fontWeight: FontWeight.bold, fontSize: 11))),
-                       Expanded(flex: 1, child: Text("PTS", style: TextStyle(color: Colors.grey[400], fontWeight: FontWeight.bold, fontSize: 11), textAlign: TextAlign.right)),
-                       Expanded(flex: 1, child: Text("AST", style: TextStyle(color: Colors.grey[400], fontWeight: FontWeight.bold, fontSize: 11), textAlign: TextAlign.right)),
-                       Expanded(flex: 1, child: Text("REB", style: TextStyle(color: Colors.grey[400], fontWeight: FontWeight.bold, fontSize: 11), textAlign: TextAlign.right)),
-                     ],
-                   ),
-                 ),
-                 Expanded(
-                   child: FutureBuilder(
-                     future: fetchPlayers(request),
-                     builder: (context, AsyncSnapshot snapshot) {
-                       if (snapshot.data == null) {
-                         return const Center(child: CircularProgressIndicator());
-                       } else {
-                         if (!snapshot.hasData) {
-                           return const Center( // Center the no data text properly
-                             child: Column(
-                               mainAxisAlignment: MainAxisAlignment.center,
-                               children: [
-                                 Text(
-                                   "No player data available.",
-                                   style: TextStyle(color: Colors.white, fontSize: 16),
-                                 ),
-                               ],
-                             ),
-                           );
-                         } else {
-                           return ListView.builder(
-                             itemCount: snapshot.data!.length,
-                             itemBuilder: (_, index) {
-                               return PlayerCard(player: snapshot.data![index]);
-                             },
-                           );
-                         }
-                       }
-                     },
-                   ),
-                 ),
-               ],
-             ),
+              margin: const EdgeInsets.symmetric(horizontal: 16.0),
+              decoration: BoxDecoration(
+                color: const Color(
+                  0xFF1F2937,
+                ), // Dark grey background for table
+                borderRadius: BorderRadius.circular(8.0),
+                border: Border.all(color: const Color(0xFF374151)),
+              ),
+              child: Column(
+                children: [
+                  // Table Header
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0,
+                      vertical: 12.0,
+                    ),
+                    decoration: const BoxDecoration(
+                      color: Color(0xFF111827), // Darker header background
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(8.0),
+                        topRight: Radius.circular(8.0),
+                      ),
+                      border: Border(
+                        bottom: BorderSide(color: Color(0xFF374151)),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          flex: 3,
+                          child: Text(
+                            "NAME",
+                            style: TextStyle(
+                              color: Colors.grey[400],
+                              fontWeight: FontWeight.bold,
+                              fontSize: 11,
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          flex: 1,
+                          child: Text(
+                            "TEAM",
+                            style: TextStyle(
+                              color: Colors.grey[400],
+                              fontWeight: FontWeight.bold,
+                              fontSize: 11,
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          flex: 1,
+                          child: Text(
+                            "POSITION",
+                            style: TextStyle(
+                              color: Colors.grey[400],
+                              fontWeight: FontWeight.bold,
+                              fontSize: 11,
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          flex: 1,
+                          child: Text(
+                            "PTS",
+                            style: TextStyle(
+                              color: Colors.grey[400],
+                              fontWeight: FontWeight.bold,
+                              fontSize: 11,
+                            ),
+                            textAlign: TextAlign.right,
+                          ),
+                        ),
+                        Expanded(
+                          flex: 1,
+                          child: Text(
+                            "AST",
+                            style: TextStyle(
+                              color: Colors.grey[400],
+                              fontWeight: FontWeight.bold,
+                              fontSize: 11,
+                            ),
+                            textAlign: TextAlign.right,
+                          ),
+                        ),
+                        Expanded(
+                          flex: 1,
+                          child: Text(
+                            "REB",
+                            style: TextStyle(
+                              color: Colors.grey[400],
+                              fontWeight: FontWeight.bold,
+                              fontSize: 11,
+                            ),
+                            textAlign: TextAlign.right,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: FutureBuilder<List<Player>>(
+                      future: fetchPlayers(request),
+                      builder: (context, AsyncSnapshot<List<Player>> snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        }
+
+                        if (snapshot.hasError) {
+                          return Center(
+                            child: Text(
+                              'Error loading players: ${snapshot.error}',
+                              style: const TextStyle(color: Colors.white),
+                            ),
+                          );
+                        }
+
+                        final players = snapshot.data;
+                        if (players == null || players.isEmpty) {
+                          return const Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  "No player data available.",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }
+
+                        return ListView.builder(
+                          itemCount: players.length,
+                          itemBuilder: (_, index) {
+                            return PlayerCard(player: players[index]);
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
           const SizedBox(height: 20), // Bottom spacing
