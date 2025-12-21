@@ -17,7 +17,6 @@ class _TeamsPageState extends State<TeamsPage> {
   String _searchQuery = "";
   String _selectedRegion = "All Regions";
   
-  // Future untuk mengambil data sekali saja saat build
   late Future<List<Team>> _futureTeams;
 
   @override
@@ -28,8 +27,7 @@ class _TeamsPageState extends State<TeamsPage> {
   }
 
   Future<List<Team>> fetchTeams(CookieRequest request) async {
-    // Sesuaikan endpoint dengan URL Django kamu
-    // Gunakan http://10.0.2.2:8000/teams/json/ jika menggunakan Android Emulator
+    // Ganti URL sesuai endpoint kamu
     final response = await request.get('http://localhost:8000/teams/json/');
     List<Team> listTeams = [];
     for (var d in response) {
@@ -49,8 +47,8 @@ class _TeamsPageState extends State<TeamsPage> {
         backgroundColor: Colors.black,
         foregroundColor: Colors.white,
         elevation: 0,
+        // (Opsional) Tombol di atas bisa dihapus jika ingin pakai tombol bawah saja
         actions: [
-          // Tombol Add New Team
           Padding(
             padding: const EdgeInsets.only(right: 8.0),
             child: IconButton(
@@ -61,7 +59,6 @@ class _TeamsPageState extends State<TeamsPage> {
                   context,
                   MaterialPageRoute(builder: (context) => const TeamFormPage()),
                 ).then((_) {
-                  // Refresh data setelah kembali dari form (opsional)
                   setState(() {
                     final request = context.read<CookieRequest>();
                     _futureTeams = fetchTeams(request);
@@ -72,6 +69,25 @@ class _TeamsPageState extends State<TeamsPage> {
           ),
         ],
       ),
+      // --- TOMBOL ADD (Floating Action Button) ---
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.blueAccent, 
+        tooltip: 'Add Team',
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const TeamFormPage()),
+          ).then((_) {
+            // Refresh data saat kembali
+            setState(() {
+              final request = context.read<CookieRequest>();
+              _futureTeams = fetchTeams(request);
+            });
+          });
+        },
+        child: const Icon(Icons.add, color: Colors.white),
+      ),
+      // -------------------------------------------
       body: FutureBuilder(
         future: _futureTeams,
         builder: (context, AsyncSnapshot<List<Team>> snapshot) {
@@ -83,15 +99,10 @@ class _TeamsPageState extends State<TeamsPage> {
             return const Center(child: Text("No teams found.", style: TextStyle(color: Colors.white)));
           }
 
-          // Data asli
           final allTeams = snapshot.data!;
-
-          // --- Logic Filter & Search ---
-          // 1. Ambil list region unik untuk Dropdown
           Set<String> regions = {"All Regions"};
           regions.addAll(allTeams.map((e) => e.region));
 
-          // 2. Filter list berdasarkan search text & dropdown
           final filteredTeams = allTeams.where((team) {
             final matchesName = team.name.toLowerCase().contains(_searchQuery.toLowerCase());
             final matchesRegion = _selectedRegion == "All Regions" || team.region == _selectedRegion;
@@ -100,13 +111,12 @@ class _TeamsPageState extends State<TeamsPage> {
 
           return Column(
             children: [
-              // --- Filter Section (Search + Dropdown) ---
+              // Filter Section
               Container(
                 padding: const EdgeInsets.all(16),
                 color: Colors.black,
                 child: Column(
                   children: [
-                    // Search Bar
                     TextField(
                       style: const TextStyle(color: Colors.white),
                       decoration: InputDecoration(
@@ -129,7 +139,6 @@ class _TeamsPageState extends State<TeamsPage> {
                     ),
                     const SizedBox(height: 12),
                     
-                    // Region Dropdown
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12),
                       decoration: BoxDecoration(
@@ -161,15 +170,15 @@ class _TeamsPageState extends State<TeamsPage> {
                 ),
               ),
 
-              // --- Grid Teams ---
+              // Grid Teams
               Expanded(
                 child: filteredTeams.isEmpty
                     ? const Center(child: Text("No teams match your filter.", style: TextStyle(color: Colors.grey)))
                     : GridView.builder(
                         padding: const EdgeInsets.all(16),
                         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2, // 2 kolom sesuai referensi
-                          childAspectRatio: 0.65, // Mengatur tinggi kartu
+                          crossAxisCount: 2,
+                          childAspectRatio: 0.65,
                           crossAxisSpacing: 16,
                           mainAxisSpacing: 16,
                         ),
@@ -179,7 +188,6 @@ class _TeamsPageState extends State<TeamsPage> {
                           return TeamCard(
                             team: team,
                             onTap: () {
-                              // Navigasi ke TeamDetailPage
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(

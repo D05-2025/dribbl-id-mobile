@@ -9,10 +9,10 @@ class MatchDetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black, // Latar belakang hitam
-      extendBodyBehindAppBar: true, // Agar gambar bisa sampai paling atas
+      backgroundColor: Colors.black, 
+      extendBodyBehindAppBar: true, 
       appBar: AppBar(
-        backgroundColor: Colors.transparent, // Transparan agar gambar terlihat
+        backgroundColor: Colors.transparent, 
         elevation: 0,
         leading: IconButton(
           icon: Container(
@@ -30,20 +30,18 @@ class MatchDetailPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // --- 1. Header Image (Thumbnail Besar) ---
             Stack(
               alignment: Alignment.bottomLeft,
               children: [
                 SizedBox(
                   width: double.infinity,
-                  height: 300, // Tinggi gambar header
+                  height: 300, 
                   child: Image.network(
                     match.matchThumbnail ?? "https://via.placeholder.com/400x300",
                     fit: BoxFit.cover,
                     errorBuilder: (_, __, ___) => Container(color: Colors.grey[900]),
                   ),
                 ),
-                // Gradient supaya teks judul terbaca
                 Container(
                   width: double.infinity,
                   height: 300,
@@ -58,7 +56,6 @@ class MatchDetailPage extends StatelessWidget {
                     ),
                   ),
                 ),
-                // Nama Tim Besar di atas Gambar
                 Padding(
                   padding: const EdgeInsets.all(20.0),
                   child: Text(
@@ -74,20 +71,17 @@ class MatchDetailPage extends StatelessWidget {
               ],
             ),
 
-            // --- 2. Detail Info (Mirip Website) ---
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Waktu & Venue
                   _buildInfoRow(Icons.calendar_today, _formatFullDate(match.tipoffAt)),
                   const SizedBox(height: 8),
                   _buildInfoRow(Icons.location_on, "Venue: ${match.venue}"),
                   
                   const SizedBox(height: 20),
                   
-                  // Status Badge
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
@@ -102,7 +96,6 @@ class MatchDetailPage extends StatelessWidget {
 
                   const SizedBox(height: 30),
 
-                  // Skor Besar
                   Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
@@ -113,7 +106,6 @@ class MatchDetailPage extends StatelessWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        // Home
                         Expanded(
                           child: Column(
                             children: [
@@ -134,9 +126,7 @@ class MatchDetailPage extends StatelessWidget {
                             ],
                           ),
                         ),
-                        // Divider
                         Container(width: 1, height: 60, color: Colors.white24),
-                        // Away
                         Expanded(
                           child: Column(
                             children: [
@@ -164,7 +154,6 @@ class MatchDetailPage extends StatelessWidget {
                   const SizedBox(height: 20),
                   const Divider(color: Colors.white24),
                   
-                  // Tombol Kembali (Opsional, karena sudah ada di AppBar)
                   TextButton.icon(
                     onPressed: () => Navigator.pop(context),
                     icon: const Icon(Icons.arrow_back, color: Colors.grey),
@@ -193,7 +182,6 @@ class MatchDetailPage extends StatelessWidget {
   }
 
   String _formatFullDate(DateTime date) {
-    // Ex: Thursday, Sep 04, 2025 • 19:30
     final days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
     final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     return '${days[date.weekday - 1]}, ${months[date.month - 1]} ${date.day}, ${date.year} • ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
